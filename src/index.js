@@ -1,4 +1,5 @@
 import express from 'express';
+import axios from 'axios';
 import dotenv from 'dotenv';
 import { handleAISensyWebhook } from './controllers/webhookController.js';
 import { getPackageById } from './services/packageService.js';
@@ -28,7 +29,7 @@ app.post('/create-payment-link', async (req, res) => {
 
     // Get package details from database
     const { data: pkg, error: pkgError } = await supabase
-      .from('packages')
+      .from('Packages')
       .select('package_amount')
       .eq('package_name', packageName)
       .single();
@@ -66,7 +67,7 @@ app.post('/create-payment-link', async (req, res) => {
       paymentId: response.data.id
     });
   } catch (error) {
-    console.error('Error creating payment link:', error.response?.data || error);
+    console.error('Error creating payment link:', error.response?.data || error.message || error);
     res.status(500).json({ error: 'Failed to create payment link' });
   }
 });
