@@ -77,23 +77,10 @@ app.post('/razorpay-webhook', async (req, res) => {
     // Send WhatsApp confirmation
     const message = `✅ Payment of ₹${pkg.package_amount} for ${pkg.package_name} confirmed!\nBooking ID: ${payment.id}`;
     
-    const response = await fetch('https://api.aisensy.com/messages', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${process.env.AISENSY_API_KEY}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        phone: userPhone,
-        message: message
-      })
+   
+    res.status(200).json({
+      sentMessage: message // This will be printed in Postman
     });
-
-    if (!response.ok) {
-      throw new Error('Failed to send WhatsApp message');
-    }
-
-    res.status(200).send();
   } catch (error) {
     console.error('Error in razorpay-webhook:', error);
     res.status(500).send('Internal server error');
