@@ -5,102 +5,69 @@ import { getPackageById } from './services/packageService.js';
 import { createClient } from '@supabase/supabase-js'; // Missing supabase client
 import fetch from 'node-fetch'; // Missing fetch import
 
+
 dotenv.config();
 
 const app = express();
 app.use(express.json());
 
-// Initialize Supabase client (missing in your code)
+// Initialize Supabase client
 const supabase = createClient(
   process.env.SUPABASE_URL,
   process.env.SUPABASE_ANON_KEY
 );
 
-// Root route
-app.get('/', (req, res) => {
-  res.json({
-    message: 'Welcome to the API',
-    endpoints: {
-      webhook: '/webhook/aisensy',
-      testPackage: '/test/package/:packageId',
-      razorpayWebhook: '/razorpay-webhook' // Added this endpoint to documentation
-    }
-  });
-});
-
-// Webhook endpoint for AISensy
-app.post('/webhook/aisensy', handleAISensyWebhook);
-
-// Razorpay webhook endpoint (moved after app initialization)
-app.post('/razorpay-webhook', async (req, res) => {
+// Create Razorpay Payment Link
+app.post('/create-payment-link', async (req, res) => {
   try {
-    // Verify Razorpay signature
-    const crypto = require('crypto');
-    const razorpaySignature = req.headers['x-razorpay-signature'];
-    const expectedSignature = crypto
-      .createHmac('sha256', process.env.RAZORPAY_WEBHOOK_SECRET)
-      .update(JSON.stringify(req.body))
-      .digest('hex');
-    
-    if (razorpaySignature !== expectedSignature) {
-      return res.status(403).send('Invalid signature');
+    const { userName, userPhone, packageName } = req.body;
+
+    if (!userName || !userPhone || !packageName) {
+      return res.status(400).json({ error: 'Missing required fields' });
     }
 
-    // Extract details from payload
-    const { payload } = req.body;
-    const payment = payload.payment.entity;
-    const userPhone = payment.notes.user_phone;
-    const packageId = payment.notes.package_id;
-
-    if (!userPhone || !packageId) {
-      return res.status(400).send('Missing user_phone or package_id in notes');
-    }
-
-    // Update booking status
-    const { error: updateError } = await supabase
-      .from('bookings')
-      .update({ status: 'paid' })
-      .eq('package_id', packageId);
-
-    if (updateError) throw updateError;
-
-    // Get package details
+    // Get package details from database
     const { data: pkg, error: pkgError } = await supabase
       .from('packages')
-      .select('package_name, package_amount')
-      .eq('package_id', packageId)
+      .select('package_amount')
+      .eq('package_name', packageName)
       .single();
 
     if (pkgError) throw pkgError;
-    if (!pkg) return res.status(404).send('Package not found');
+    if (!pkg) return res.status(404).json({ error: 'Package not found' });
 
-    // Send WhatsApp confirmation
-    const message = `✅ Payment of ₹${pkg.package_amount} for ${pkg.package_name} confirmed!\nBooking ID: ${payment.id}`;
-    
-   
+    const amount = pkg.package_amount * 100; // Convert to paise
+
+    // Create Razorpay Payment Link
+    const response = await axios.post(
+      'https://api.razorpay.com/v1/payment_links',
+      {
+        amount: amount,
+        currency: 'INR',
+        description: `Payment for ${packageName}`,
+        customer: {
+          name: userName,
+          contact: userPhone
+        },
+        notify: { sms: true },
+        callback_url: 'https://yourwebsite.com/payment-success',
+        callback_method: 'get'
+      },
+      {
+        auth: {
+          username: process.env.RAZORPAY_KEY_ID,
+          password: process.env.RAZORPAY_KEY_SECRET
+        }
+      }
+    );
+
     res.status(200).json({
-      sentMessage: message // This will be printed in Postman
+      paymentLink: response.data.short_url,
+      paymentId: response.data.id
     });
   } catch (error) {
-    console.error('Error in razorpay-webhook:', error);
-    res.status(500).send('Internal server error');
-  }
-});
-
-// Test endpoint
-app.get('/test/package/:packageId', async (req, res) => {
-  try {
-    const packageId = req.params.packageId;
-    const packageDetails = await getPackageById(packageId);
-    
-    if (!packageDetails) {
-      return res.status(404).json({ error: 'Package not found' });
-    }
-
-    res.status(200).json(packageDetails);
-  } catch (error) {
-    console.error('Error:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    console.error('Error creating payment link:', error.response?.data || error);
+    res.status(500).json({ error: 'Failed to create payment link' });
   }
 });
 
