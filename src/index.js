@@ -5,6 +5,7 @@ import { handleAISensyWebhook } from './controllers/webhookController.js';
 import { getPackageById } from './services/packageService.js';
 import { createClient } from '@supabase/supabase-js'; // Missing supabase client
 import fetch from 'node-fetch'; // Missing fetch import
+import crypto from 'crypto';
 
 
 dotenv.config();
@@ -96,7 +97,43 @@ app.post('/create-payment-link', async (req, res) => {
   }
 });
 
+app.post('/webhook', express.json({ type: 'application/json' }), async (req, res) => {
+  try {
+      const secret = process.env.RAZORPAY_WEBHOOK_SECRET; // Set in .env
+      const signature = req.headers['x-razorpay-signature'];
+      const crypto = await import('crypto'); // Dynamic import to avoid issues
+      
+      // Validate webhook signature
+      const hmac = crypto.createHmac('sha256', secret);
+      hmac.update(JSON.stringify(req.body));
+      const digest = hmac.digest('hex');
+
+      if (digest !== signature) {
+          return res.status(400).json({ error: 'Invalid webhook signature' });
+      }
+
+      const event = req.body.event;
+      const paymentId = req.body.payload.payment_link.entity.id;
+      const status = req.body.payload.payment_link.entity.status;
+      const userPhone = req.body.payload.payment_link.entity.customer.contact;
+
+      if (event === 'payment_link.paid' && status === 'paid') {
+          console.log(`Payment received! ✅`);
+          console.log(`Payment ID: ${paymentId}`);
+          console.log(`Status: ${status}`);
+          console.log(`User Phone: ${userPhone}`);
+      }
+
+      res.status(200).json({ success: true });
+  } catch (error) {
+      console.error('Webhook Error:', error);
+      res.status(500).json({ error: 'Failed to process webhook' });
+  }
+});
+
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
