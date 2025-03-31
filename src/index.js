@@ -93,7 +93,7 @@ app.post('/create-payment-link', async (req, res) => {
     });
 
     const paymentLink = response.data.short_url;
-    await sendPaymentWhatsAppMessage(amount, userPhone, paymentLink)
+    await sendPaymentWhatsAppMessage(amount, userPhone, userName ,paymentLink)
 
   } catch (error) {
     console.error('Error creating payment link:', error.response?.data || error.message || error);
@@ -242,7 +242,7 @@ const sendConfirmationWhatsAppMessage = async (userPhone, firstName, packageName
   }
 };
 
-const sendPaymentWhatsAppMessage = async (amount,userPhone,paymentLink) => {
+const sendPaymentWhatsAppMessage = async (amount,userPhone,userName,paymentLink) => {
   try {
     const response = await axios.post(
       'https://backend.aisensy.com/campaign/t1/api/v2', // AISensy API URL
@@ -250,7 +250,7 @@ const sendPaymentWhatsAppMessage = async (amount,userPhone,paymentLink) => {
         apiKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ZTZkNGYyNGY4YmE4MGY3YWU0NThhNyIsIm5hbWUiOiJUcmlwdXZhLXNpdGUiLCJhcHBOYW1lIjoiQWlTZW5zeSIsImNsaWVudElkIjoiNjdkN2RmZTBlNDgwMWIwYmYxN2E5ZjY5IiwiYWN0aXZlUGxhbiI6IkZSRUVfRk9SRVZFUiIsImlhdCI6MTc0MzE4MTA0Mn0.IvYFVDvFxFOrr3rAK8a2G0DfvFZKgloXJs0Ol4GKnpI",
         campaignName: "booking_payment_link",
         destination: userPhone,
-        userName: firstName,
+        userName: userName
         templateParams: [String(amount),String(paymentLink)]
       }
     );
