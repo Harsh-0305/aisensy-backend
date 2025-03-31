@@ -28,7 +28,7 @@ app.get('/get-package-amount', async (req, res) => {
 
     // Query Supabase for package amount
     const { data: pkg, error: pkgError } = await supabase
-      .from('Packages')
+      .from('packages')
       .select('package_amount')
       .eq('package_name', packageName)
       .single();
@@ -39,7 +39,7 @@ app.get('/get-package-amount', async (req, res) => {
     res.status(200).json({ package_amount: pkg.package_amount });
   } catch (error) {
     console.error('Error fetching package amount:', error);
-    res.status(500).json({ error: 'Failed to fetch package amount' });
+    res.status(500).json({ error: error.message || 'Failed to fetch package amount' });
   }
 });
 
