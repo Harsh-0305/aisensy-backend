@@ -64,7 +64,7 @@ app.post('/create-payment-link', async (req, res) => {
     if (pkgError) throw pkgError;
     if (!pkg) return res.status(404).json({ error: 'Package not found' });
 
-    const amount = pkg.package_adv_amount * 100; // Convert to paise
+    const amount = pkg.package_adv_amt * 100; // Convert to paise
 
     // Create Razorpay Payment Link
     const response = await axios.post(
