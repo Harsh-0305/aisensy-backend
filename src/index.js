@@ -132,6 +132,9 @@ app.post('/webhook', async (req, res) => {
       const userFirstName = nameParts[0];
       const userLastName = nameParts.slice(1).join(' ') || ''; // Handles cases where there's no last name
 
+      // Send WhatsApp message
+      await sendWhatsAppMessage(userPhone, userFirstName, packageName, paymentId, amount);
+
 
       // 🔹 Step 1: Check if User Exists in Users Table
       let { data: user, error: userError } = await supabase
