@@ -44,7 +44,7 @@ app.get('/get-package-amount', async (req, res) => {
 });
 
 // Create Razorpay Payment Link
-/*
+
 app.post('/create-payment-link', async (req, res) => {
   try {
     const { userName, userPhone, packageName } = req.body;
@@ -55,7 +55,7 @@ app.post('/create-payment-link', async (req, res) => {
 
     // Get package details from database
     const { data: pkg, error: pkgError } = await supabase
-      .from('Packages')
+      .from('packages')
       .select('package_amount')
       .eq('package_name', packageName)
       .single();
@@ -95,7 +95,7 @@ app.post('/create-payment-link', async (req, res) => {
     res.status(500).json({ error: 'Failed to create payment link' });
   }
 });
-*/
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
