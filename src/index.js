@@ -222,12 +222,12 @@ const sendWhatsAppMessage = async (userPhone, firstName, packageName, paymentId,
     const response = await axios.post(
       'https://backend.aisensy.com/campaign/t1/api/v2', // AISensy API URL
       {
-        apiKey: process.env.AISENSY_API_KEY,
+        apiKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ZTZkNGYyNGY4YmE4MGY3YWU0NThhNyIsIm5hbWUiOiJUcmlwdXZhLXNpdGUiLCJhcHBOYW1lIjoiQWlTZW5zeSIsImNsaWVudElkIjoiNjdkN2RmZTBlNDgwMWIwYmYxN2E5ZjY5IiwiYWN0aXZlUGxhbiI6IkZSRUVfRk9SRVZFUiIsImlhdCI6MTc0MzE4MTA0Mn0.IvYFVDvFxFOrr3rAK8a2G0DfvFZKgloXJs0Ol4GKnpI",
         campaignName: "booking_confirmation",
         destination: userPhone,
         userName: firstName,
         templateParams: [firstName, amount, packageName, paymentId]
-      },
+      }
     );
 
     console.log(`📩 WhatsApp message sent successfully to ${phone}`);
