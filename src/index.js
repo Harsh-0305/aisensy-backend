@@ -146,7 +146,7 @@ app.post('/webhook', async (req, res) => {
 
         const { data: newUser, error: newUserError } = await supabase
           .from('users')
-          .insert([{ first_name: userFirstName, last_name: userLastName, user_phone: userPhone }])
+          .insert([{ first_name: userFirstName, last_name: userLastName, phone_number: userPhone }])
           .select('user_id')
           .single();
 
