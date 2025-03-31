@@ -57,14 +57,14 @@ app.post('/create-payment-link', async (req, res) => {
     // Get package details from database
     const { data: pkg, error: pkgError } = await supabase
       .from('packages')
-      .select('package_amount')
+      .select('package_adv_amt')
       .eq('package_name', packageName)
       .single();
 
     if (pkgError) throw pkgError;
     if (!pkg) return res.status(404).json({ error: 'Package not found' });
 
-    const amount = pkg.package_amount * 100; // Convert to paise
+    const amount = pkg.package_adv_amount * 100; // Convert to paise
 
     // Create Razorpay Payment Link
     const response = await axios.post(
