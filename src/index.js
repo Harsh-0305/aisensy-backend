@@ -116,6 +116,7 @@ app.post('/webhook', express.json({ type: 'application/json' }), async (req, res
       const paymentId = req.body.payload.payment_link.entity.id;
       const status = req.body.payload.payment_link.entity.status;
       const userPhone = req.body.payload.payment_link.entity.customer.contact;
+      const userName = req.body.payload.payment_link.entity.customer.name;
       const packageName = req.body.payload.payment_link.entity.description.replace('Payment for ', ''); // Extract package name
 
       if (event === 'payment_link.paid' && status === 'paid') {
