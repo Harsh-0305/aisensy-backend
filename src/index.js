@@ -226,7 +226,7 @@ const sendWhatsAppMessage = async (userPhone, firstName, packageName, paymentId,
         campaignName: "booking_confirmation",
         destination: userPhone,
         userName: firstName,
-        templateParams: [string(firstName), string(amount), string(packageName), string(paymentId)]
+        templateParams: [String(firstName), String(amount), String(packageName), String(paymentId)]
       }
     );
 
