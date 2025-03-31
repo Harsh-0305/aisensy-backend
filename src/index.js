@@ -122,6 +122,39 @@ app.post('/webhook', express.json({ type: 'application/json' }), async (req, res
           console.log(`Payment ID: ${paymentId}`);
           console.log(`Status: ${status}`);
           console.log(`User Phone: ${userPhone}`);
+          
+          // Fetch package_id from Supabase using package name
+          const { data: packageData, error: packageError } = await supabase
+              .from('packages')
+              .select('package_id')
+              .eq('package_name', packageName)
+              .single();
+
+          if (packageError || !packageData) {
+              console.error('Package not found in database:', packageError);
+              return res.status(404).json({ error: 'Package not found' });
+          }
+
+          const packageId = packageData.package_id;
+
+          // Insert booking into Supabase
+          const { data, error } = await supabase
+              .from('bookings')
+              .insert([
+                  {
+                      user_name: userName,
+                      package_id: packageId,
+                      booking_date: new Date().toISOString(), // Current date
+                      status: 'Paid'
+                  }
+              ]);
+
+          if (error) {
+              console.error('Error inserting booking:', error);
+              return res.status(500).json({ error: 'Failed to insert booking' });
+          }
+
+          console.log(`Booking inserted successfully for ${userName}! ✅`);
       }
 
       res.status(200).json({ success: true });
