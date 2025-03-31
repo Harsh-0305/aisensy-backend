@@ -132,6 +132,17 @@ app.post('/webhook', async (req, res) => {
       const userFirstName = nameParts[0];
       const userLastName = nameParts.slice(1).join(' ') || ''; // Handles cases where there's no last name
 
+      const { data: pkg, error: pkgError } = await supabase
+      .from('packages')
+      .select('package_adv_amt')
+      .eq('package_name', packageName)
+      .single();
+
+    if (pkgError) throw pkgError;
+    if (!pkg) return res.status(404).json({ error: 'Package not found' });
+
+    const amount = pkg.package_adv_amt * 100; // Convert to paise
+
       // Send WhatsApp message
       await sendWhatsAppMessage(userPhone, userFirstName, packageName, paymentId, amount);
 
