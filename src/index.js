@@ -91,6 +91,9 @@ app.post('/create-payment-link', async (req, res) => {
       paymentLink: response.data.short_url,
       paymentId: response.data.id
     });
+
+    await sendPaymentWhatsAppMessage(amount, userPhone, paymentLink)
+
   } catch (error) {
     console.error('Error creating payment link:', error.response?.data || error.message || error);
     res.status(500).json({ error: 'Failed to create payment link' });
@@ -144,7 +147,7 @@ app.post('/webhook', async (req, res) => {
     const amount = pkg2.package_adv_amt * 100; // Convert to paise
 
       // Send WhatsApp message
-      await sendWhatsAppMessage(userPhone, userFirstName, packageName, paymentId, amount);
+      await sendConfirmationWhatsAppMessage(userPhone, userFirstName, packageName, paymentId, amount);
 
 
       // 🔹 Step 1: Check if User Exists in Users Table
@@ -217,7 +220,7 @@ app.post('/webhook', async (req, res) => {
   }
 });
 
-const sendWhatsAppMessage = async (userPhone, firstName, packageName, paymentId, amount) => {
+const sendConfirmationWhatsAppMessage = async (userPhone, firstName, packageName, paymentId, amount) => {
   try {
     const response = await axios.post(
       'https://backend.aisensy.com/campaign/t1/api/v2', // AISensy API URL
@@ -233,6 +236,25 @@ const sendWhatsAppMessage = async (userPhone, firstName, packageName, paymentId,
     console.log(`📩 WhatsApp message sent successfully`);
   } catch (error) {
     console.error('❌ Failed to send WhatsApp message:', error.response?.data || error.message);
+  }
+};
+
+const sendPaymentWhatsAppMessage = async (amount,userPhone,paymentLink) => {
+  try {
+    const response = await axios.post(
+      'https://backend.aisensy.com/campaign/t1/api/v2', // AISensy API URL
+      {
+        apiKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ZTZkNGYyNGY4YmE4MGY3YWU0NThhNyIsIm5hbWUiOiJUcmlwdXZhLXNpdGUiLCJhcHBOYW1lIjoiQWlTZW5zeSIsImNsaWVudElkIjoiNjdkN2RmZTBlNDgwMWIwYmYxN2E5ZjY5IiwiYWN0aXZlUGxhbiI6IkZSRUVfRk9SRVZFUiIsImlhdCI6MTc0MzE4MTA0Mn0.IvYFVDvFxFOrr3rAK8a2G0DfvFZKgloXJs0Ol4GKnpI",
+        campaignName: "booking_payment_link",
+        destination: userPhone,
+        userName: firstName,
+        templateParams: [String(amount),String(paymentLink)]
+      }
+    );
+
+    console.log(`📩 Payment Link sent successfully`);
+  } catch (error) {
+    console.error('❌ Failed to send Payment Link:', error.response?.data || error.message);
   }
 };
 
