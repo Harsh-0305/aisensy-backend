@@ -18,7 +18,33 @@ const supabase = createClient(
   process.env.SUPABASE_ANON_KEY
 );
 
+app.get('/get-package-amount', async (req, res) => {
+  try {
+    const { packageName } = req.query;
+
+    if (!packageName) {
+      return res.status(400).json({ error: 'Missing packageName parameter' });
+    }
+
+    // Query Supabase for package amount
+    const { data: pkg, error: pkgError } = await supabase
+      .from('Packages')
+      .select('package_amount')
+      .eq('package_name', packageName)
+      .single();
+
+    if (pkgError) throw pkgError;
+    if (!pkg) return res.status(404).json({ error: 'Package not found' });
+
+    res.status(200).json({ package_amount: pkg.package_amount });
+  } catch (error) {
+    console.error('Error fetching package amount:', error);
+    res.status(500).json({ error: 'Failed to fetch package amount' });
+  }
+});
+
 // Create Razorpay Payment Link
+/*
 app.post('/create-payment-link', async (req, res) => {
   try {
     const { userName, userPhone, packageName } = req.body;
@@ -50,9 +76,7 @@ app.post('/create-payment-link', async (req, res) => {
           name: userName,
           contact: userPhone
         },
-        notify: { sms: true },
-        callback_url: 'https://yourwebsite.com/payment-success',
-        callback_method: 'get'
+        notify: { sms: true }
       },
       {
         auth: {
@@ -71,7 +95,7 @@ app.post('/create-payment-link', async (req, res) => {
     res.status(500).json({ error: 'Failed to create payment link' });
   }
 });
-
+*/
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
