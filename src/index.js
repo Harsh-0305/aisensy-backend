@@ -92,11 +92,14 @@ app.post('/create-payment-link', async (req, res) => {
       paymentId: response.data.id
     });
 
+    const paymentLink = response.data.short_url;
     await sendPaymentWhatsAppMessage(amount, userPhone, paymentLink)
 
   } catch (error) {
     console.error('Error creating payment link:', error.response?.data || error.message || error);
-    res.status(500).json({ error: 'Failed to create payment link' });
+    if (!res.headersSent) { // ✅ Check if response is already sent
+      res.status(500).json({ error: 'Failed to create payment link' });
+    }
   }
 });
 
