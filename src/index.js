@@ -230,7 +230,7 @@ const sendWhatsAppMessage = async (userPhone, firstName, packageName, paymentId,
       }
     );
 
-    console.log(`📩 WhatsApp message sent successfully to ${phone}`);
+    console.log(`📩 WhatsApp message sent successfully`);
   } catch (error) {
     console.error('❌ Failed to send WhatsApp message:', error.response?.data || error.message);
   }
