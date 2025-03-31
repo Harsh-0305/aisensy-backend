@@ -127,11 +127,17 @@ app.post('/webhook', async (req, res) => {
       console.log(`User Phone: ${userPhone}`);
       console.log(`Package Name: ${packageName}`);
 
+      const nameParts = userName.split(' ');
+
+      const userFirstName = nameParts[0];
+      const userLastName = nameParts.slice(1).join(' ') || ''; // Handles cases where there's no last name
+
+
       // 🔹 Step 1: Check if User Exists in Users Table
       let { data: user, error: userError } = await supabase
         .from('users')
         .select('user_id')
-        .eq('user_name', userName)
+        .eq('first_name', userFirstName)
         .single();
 
       // 🔹 Step 2: If User Does Not Exist, Create New User
@@ -140,7 +146,7 @@ app.post('/webhook', async (req, res) => {
 
         const { data: newUser, error: newUserError } = await supabase
           .from('users')
-          .insert([{ user_name: userName, user_phone: userPhone }])
+          .insert([{ first_name: userFirstName, last_name: userLastName, user_phone: userPhone }])
           .select('user_id')
           .single();
 
