@@ -103,7 +103,17 @@ app.post('/create-payment-link', async (req, res) => {
   }
 });
 
-app.post('/webhook', async (req, res) => {
+app.post("/webhook", (req, res) => {
+  try {
+      console.log("Incoming Webhook Data:", req.body); // Print the response in console
+      res.status(200).send("Webhook received");
+  } catch (error) {
+      console.error("Error processing webhook:", error);
+      res.status(500).send("Internal Server Error");
+  }
+});
+
+app.post('/razorpay-webhook', async (req, res) => {
   try {
     const secret = process.env.RAZORPAY_WEBHOOK_SECRET;
     const signature = req.headers['x-razorpay-signature'];
