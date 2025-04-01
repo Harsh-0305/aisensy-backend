@@ -116,13 +116,30 @@ const verifySignature = (req) => {
   return signature === expectedSignature;
 };
 
+let storedMessages = {};
+
 app.post("/webhook", async (req, res) => {
   try {
 
       const userPhone = `+91${req.body.data.customer.phone_number}`
       const userMessage = req.body.data.message.message;
 
-        await sendWhatsAppMessage(userPhone, userMessage);
+      const packageName = userMessage.trim();
+
+      const { data: pkg, error: pkgError } = await supabase
+      .from('packages')
+      .select('package_amount')
+      .eq('package_name', packageName)
+      .single();
+
+    if (pkgError) throw pkgError;
+    if (!pkg) return res.status(404).json({ error: 'Package not found' });
+
+    const packageAmount = pkg.package_amount;
+
+    const responseMessage = `The price for ${packageName} is ₹${packageAmount}.`;
+
+        await sendWhatsAppMessage(userPhone, responseMessage);
 
       console.log("Incoming Webhook Data:", userMessage); // Print response in console
       res.status(200).send("Webhook received");
