@@ -116,16 +116,46 @@ const verifySignature = (req) => {
   return signature === expectedSignature;
 };
 
-app.post("/webhook", (req, res) => {
+app.post("/webhook", async (req, res) => {
   try {
 
-      console.log("Incoming Webhook Data:", req.body); // Print response in console
+      const userPhone = req.body.data.customer.phone_number;
+      const userMessage = req.body.data.message.message;
+
+        await sendWhatsAppMessage(userPhone, userMessage);
+
+      console.log("Incoming Webhook Data:", userMessage); // Print response in console
       res.status(200).send("Webhook received");
   } catch (error) {
       console.error("Error processing webhook:", error);
       res.status(500).send("Internal Server Error");
   }
 });
+
+const sendWhatsAppMessage = async (phone, message) => {
+  try {
+      const response = await axios.post(
+          "https://api.interakt.ai/v1/public/message/",
+          {
+              countryCode: "+91", // Adjust based on user's country code
+              phoneNumber: phone,
+              callbackData: "response_sent",
+              type: "text",
+              message: message
+          },
+          {
+              headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${INTERAKT_API_KEY}`
+              }
+          }
+      );
+
+      console.log("Message sent successfully:", response.data);
+  } catch (error) {
+      console.error("Error sending message:", error.response ? error.response.data : error);
+  }
+};
 
 
 app.post('/razorpay-webhook', async (req, res) => {
@@ -247,6 +277,7 @@ app.post('/razorpay-webhook', async (req, res) => {
     res.status(500).json({ error: 'Failed to process webhook' });
   }
 });
+
 
 const sendConfirmationWhatsAppMessage = async (userPhone, firstName, packageName, paymentId, amount) => {
   try {
