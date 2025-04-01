@@ -121,6 +121,7 @@ let storedMessages = {};
 app.post("/webhook", async (req, res) => {
   try {
 
+      const userName = req.body.data.customer.name;
       const userPhone = `+91${req.body.data.customer.phone_number}`
       const userMessage = req.body.data.message.message;
 
@@ -135,9 +136,7 @@ app.post("/webhook", async (req, res) => {
     if (pkgError) throw pkgError;
     if (!pkg) return res.status(404).json({ error: 'Package not found' });
 
-    const packageAmount = pkg.package_adv_amt;
-
-    
+    const packageAmount = pkg.package_adv_amt
 
 //******************/
 
@@ -150,7 +149,7 @@ app.post("/webhook", async (req, res) => {
         currency: 'INR',
         description: `Payment for ${packageName}`,
         customer: {
-          name: "Harsh",
+          name: userName,
           contact: userPhone
         },
         notify: { sms: true }
@@ -169,7 +168,7 @@ app.post("/webhook", async (req, res) => {
     });
 
     const paymentLink = response.data.short_url;
-    const responseMessage = `The payment link for ${packageName} is ₹${paymentLink}.`;
+    const responseMessage = `Thank you for choosingus! To confirm your booking, please complete the payment of ₹${packageAmount} using the link: ${paymentLink}.`;
 
     //*********** */
 
@@ -259,9 +258,10 @@ app.post('/razorpaywebhook', async (req, res) => {
 
       // Send WhatsApp message
 
-      await sendWhatsAppMessage(userPhone, paymentId);
+      const responseMessage2 = `Your payment has been received.\n Payment Id: ${paymentId}`;
+      await sendWhatsAppMessage(userPhone, responseMessage2);
 
-      await sendConfirmationWhatsAppMessage(userPhone, userFirstName, packageName, paymentId, amount);
+      //await sendConfirmationWhatsAppMessage(userPhone, userFirstName, packageName, paymentId, amount);
 
 
       // 🔹 Step 1: Check if User Exists in Users Table
@@ -335,7 +335,7 @@ app.post('/razorpaywebhook', async (req, res) => {
 });
 
 
-const sendConfirmationWhatsAppMessage = async (userPhone, firstName, packageName, paymentId, amount) => {
+/*const sendConfirmationWhatsAppMessage = async (userPhone, firstName, packageName, paymentId, amount) => {
   try {
     const response = await axios.post(
       'https://backend.aisensy.com/campaign/t1/api/v2', // AISensy API URL
@@ -353,7 +353,8 @@ const sendConfirmationWhatsAppMessage = async (userPhone, firstName, packageName
     console.error('❌ Failed to send WhatsApp message:', error.response?.data || error.message);
   }
 };
-
+*/
+/*
 const sendPaymentWhatsAppMessage = async (amount,userPhone,userName,paymentLink) => {
   try {
     const response = await axios.post(
@@ -372,6 +373,8 @@ const sendPaymentWhatsAppMessage = async (amount,userPhone,userName,paymentLink)
     console.error('❌ Failed to send Payment Link:', error.response?.data || error.message);
   }
 };
+*/
+
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
