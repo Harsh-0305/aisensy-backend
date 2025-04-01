@@ -119,7 +119,7 @@ const verifySignature = (req) => {
 app.post("/webhook", async (req, res) => {
   try {
 
-      const userPhone = req.body.data.customer.phone_number;
+      const userPhone = `+91${req.body.data.customer.phone_number}`
       const userMessage = req.body.data.message.message;
 
         await sendWhatsAppMessage(userPhone, userMessage);
