@@ -160,7 +160,7 @@ const sendWhatsAppMessage = async (phone, message) => {
 };
 
 
-app.post('/razorpay-webhook', async (req, res) => {
+app.post('/razorpaywebhook', async (req, res) => {
   try {
     const secret = process.env.RAZORPAY_WEBHOOK_SECRET;
     const signature = req.headers['x-razorpay-signature'];
