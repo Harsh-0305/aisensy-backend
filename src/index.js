@@ -128,14 +128,14 @@ app.post("/webhook", async (req, res) => {
 
       const { data: pkg, error: pkgError } = await supabase
       .from('packages')
-      .select('package_amount')
+      .select('package_adv_amt')
       .eq('package_name', packageName)
       .single();
 
     if (pkgError) throw pkgError;
     if (!pkg) return res.status(404).json({ error: 'Package not found' });
 
-    const packageAmount = pkg.package_amount;
+    const packageAmount = pkg.package_adv_amt;
 
     const responseMessage = `The price for ${packageName} is ₹${packageAmount}.`;
 
