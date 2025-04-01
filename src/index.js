@@ -139,7 +139,7 @@ app.post("/webhook", async (req, res) => {
 
     
 
-//*****************8 */
+//******************/
 
     const amount = pkg.package_adv_amt * 100;
 
@@ -258,6 +258,9 @@ app.post('/razorpaywebhook', async (req, res) => {
     const amount = pkg2.package_adv_amt * 100; // Convert to paise
 
       // Send WhatsApp message
+
+      await sendWhatsAppMessage(userPhone, paymentId);
+
       await sendConfirmationWhatsAppMessage(userPhone, userFirstName, packageName, paymentId, amount);
 
 
