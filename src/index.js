@@ -103,15 +103,34 @@ app.post('/create-payment-link', async (req, res) => {
   }
 });
 
+const INTERAKT_SECRET = process.env.INTERAKT_SECRET;
+const verifySignature = (req) => {
+  const signature = req.headers["x-interakt-signature"];
+  const payload = JSON.stringify(req.body);
+  
+  const expectedSignature = crypto
+      .createHmac("sha256", INTERAKT_SECRET)
+      .update(payload)
+      .digest("hex");
+
+  return signature === expectedSignature;
+};
+
 app.post("/webhook", (req, res) => {
   try {
-      console.log("Incoming Webhook Data:", req.body); // Print the response in console
+      if (!verifySignature(req)) {
+          console.error("Invalid Interakt Signature");
+          return res.status(401).send("Unauthorized");
+      }
+
+      console.log("Incoming Webhook Data:", req.body); // Print response in console
       res.status(200).send("Webhook received");
   } catch (error) {
       console.error("Error processing webhook:", error);
       res.status(500).send("Internal Server Error");
   }
 });
+
 
 app.post('/razorpay-webhook', async (req, res) => {
   try {
