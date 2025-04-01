@@ -118,10 +118,6 @@ const verifySignature = (req) => {
 
 app.post("/webhook", (req, res) => {
   try {
-      if (!verifySignature(req)) {
-          console.error("Invalid Interakt Signature");
-          return res.status(401).send("Unauthorized");
-      }
 
       console.log("Incoming Webhook Data:", req.body); // Print response in console
       res.status(200).send("Webhook received");
