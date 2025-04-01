@@ -137,7 +137,41 @@ app.post("/webhook", async (req, res) => {
 
     const packageAmount = pkg.package_adv_amt;
 
-    const responseMessage = `The price for ${packageName} is ₹${packageAmount}.`;
+    
+
+//*****************8 */
+
+    const amount = pkg.package_adv_amt * 100;
+
+    const response = await axios.post(
+      'https://api.razorpay.com/v1/payment_links',
+      {
+        amount: amount,
+        currency: 'INR',
+        description: `Payment for ${packageName}`,
+        customer: {
+          name: "Harsh",
+          contact: userPhone
+        },
+        notify: { sms: true }
+      },
+      {
+        auth: {
+          username: process.env.RAZORPAY_KEY_ID,
+          password: process.env.RAZORPAY_KEY_SECRET
+        }
+      }
+    );
+
+    res.status(200).json({
+      paymentLink: response.data.short_url,
+      paymentId: response.data.id
+    });
+
+    const paymentLink = response.data.short_url;
+    const responseMessage = `The payment link for ${packageName} is ₹${paymentLink}.`;
+
+    //*********** */
 
         await sendWhatsAppMessage(userPhone, responseMessage);
 
