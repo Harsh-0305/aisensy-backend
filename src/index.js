@@ -146,7 +146,7 @@ const sendWhatsAppMessage = async (phone, message) => {
           {
               headers: {
                   "Content-Type": "application/json",
-                  "Authorization": `Bearer ${INTERAKT_API_KEY}`
+                  "Authorization": `Bearer ${process.env.INTERAKT_API_KEY}`
               }
           }
       );
