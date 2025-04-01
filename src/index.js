@@ -137,16 +137,18 @@ const sendWhatsAppMessage = async (phone, message) => {
       const response = await axios.post(
           "https://api.interakt.ai/v1/public/message/",
           {
-              countryCode: "+91", // Adjust based on user's country code
-              phoneNumber: phone,
-              callbackData: "response_sent",
-              type: "text",
-              message: message
+            userId: "", // Optional, keep empty if not needed
+            fullPhoneNumber: phone,
+            callbackData: "response_sent",
+            type: "Text",
+            data: {
+                message: message
+            }
           },
           {
               headers: {
                   "Content-Type": "application/json",
-                  "Authorization": `Bearer ${process.env.INTERAKT_API_KEY}`
+                  "Authorization": `Basic ${process.env.INTERAKT_API_KEY}`
               }
           }
       );
