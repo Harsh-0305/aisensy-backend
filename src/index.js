@@ -119,12 +119,14 @@ const verifySignature = (req) => {
 let storedMessages = {};
 
 app.post("/webhook", async (req, res) => {
-  try { 
+  try {
     console.log("Working");
-  }
-
-       catch (error) {
-      console.error("Error sending message:", error.response ? error.response.data : error);
+    // Send a 200 OK response
+    res.status(200).send('Request received successfully');
+  } catch (error) {
+    console.error("Error sending message:", error.response ? error.response.data : error);
+    // Send a 500 error response if something goes wrong
+    res.status(500).send('Internal Server Error');
   }
 });
 
