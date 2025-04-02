@@ -126,7 +126,7 @@ app.post("/webhook", async (req, res) => {
       const userMessage = req.body.data.message.message;
 
       console.log("Name", userName);
-      onsole.log("Phone", userPhone);
+      console.log("Phone", userPhone);
 
       const packageName = userMessage.trim();
 
