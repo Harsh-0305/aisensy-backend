@@ -152,7 +152,7 @@ app.post("/webhook", async (req, res) => {
         currency: 'INR',
         description: `Payment for ${packageName}`,
         customer: {
-          name: "Harsh",
+          name: "Harshh",
           contact: userPhone
         },
         notify: { sms: true }
