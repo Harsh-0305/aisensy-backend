@@ -119,99 +119,14 @@ const verifySignature = (req) => {
 let storedMessages = {};
 
 app.post("/webhook", async (req, res) => {
-  try {
+  try { 
+    console.log("Working");
+  }
 
-      console.log("Working");
-      /*const userName = req.body.data.customer.name;
-      const userPhone = `+91${req.body.data.customer.phone_number}`
-      const userMessage = req.body.data.message.message;
-
-      console.log("Name", userName);
-      console.log("Phone", userPhone);
-
-      const packageName = userMessage;.trim();
-
-      const { data: pkg, error: pkgError } = await supabase
-      .from('packages')
-      .select('package_adv_amt')
-      .eq('package_name', packageName)
-      .single();
-
-    if (pkgError) throw pkgError;
-    if (!pkg) return res.status(404).json({ error: 'Package not found' });
-
-    const packageAmount = pkg.package_adv_amt */
-
-//******************/
-
-  /*  const amount = pkg.package_adv_amt * 100;
-
-    const response = await axios.post(
-      'https://api.razorpay.com/v1/payment_links',
-      {
-        amount: amount,
-        currency: 'INR',
-        description: `Payment for ${packageName}`,
-        customer: {
-          name: "Harshh",
-          contact: userPhone
-        },
-        notify: { sms: true }
-      },
-      {
-        auth: {
-          username: process.env.RAZORPAY_KEY_ID,
-          password: process.env.RAZORPAY_KEY_SECRET
-        }
-      }
-    );
-
-    res.status(200).json({
-      paymentLink: response.data.short_url,
-      paymentId: response.data.id
-    });
-
-    const paymentLink = response.data.short_url;
-    const responseMessage = `Thank you for choosingus! To confirm your booking, please complete the payment of ₹${packageAmount} using the link: ${paymentLink}.`; */
-
-    //*********** */
-
-       /* await sendWhatsAppMessage(userPhone, responseMessage);
-
-      console.log("Incoming Webhook Data:", userMessage); // Print response in console
-      res.status(200).send("Webhook received");
-  } catch (error) {
-      console.error("Error processing webhook:", error);
-      res.status(500).send("Internal Server Error");*/
-  } 
-});
-
-const sendWhatsAppMessage = async (phone, message) => {
-  try {
-      const response = await axios.post(
-          "https://api.interakt.ai/v1/public/message/",
-          {
-            userId: "", // Optional, keep empty if not needed
-            fullPhoneNumber: phone,
-            callbackData: "response_sent",
-            type: "Text",
-            data: {
-                message: message
-            }
-          },
-          {
-              headers: {
-                  "Content-Type": "application/json",
-                  "Authorization": "Basic dU9OWUI3bEtRbmFhM0t6VWViSWlBVVRyN09COG1sNENzdHVnalAtQkdBSTo="
-              }
-          }
-      );
-
-      console.log("Message sent successfully:", response.data);
-  } catch (error) {
+       catch (error) {
       console.error("Error sending message:", error.response ? error.response.data : error);
   }
-};
+});
 
 
 app.post('/razorpaywebhook', async (req, res) => {
