@@ -128,7 +128,7 @@ app.post("/webhook", async (req, res) => {
       console.log("Name", userName);
       console.log("Phone", userPhone);
 
-      const packageName = userMessage.trim();
+      //const packageName = userMessage.trim();
 
       const { data: pkg, error: pkgError } = await supabase
       .from('packages')
