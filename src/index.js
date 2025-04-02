@@ -125,6 +125,9 @@ app.post("/webhook", async (req, res) => {
       const userPhone = `+91${req.body.data.customer.phone_number}`
       const userMessage = req.body.data.message.message;
 
+      console.log("Name", userName);
+      onsole.log("Phone", userPhone);
+
       const packageName = userMessage.trim();
 
       const { data: pkg, error: pkgError } = await supabase
@@ -149,7 +152,7 @@ app.post("/webhook", async (req, res) => {
         currency: 'INR',
         description: `Payment for ${packageName}`,
         customer: {
-          name: userName,
+          name: "Harsh",
           contact: userPhone
         },
         notify: { sms: true }
