@@ -121,14 +121,15 @@ let storedMessages = {};
 app.post("/webhook", async (req, res) => {
   try {
 
-      const userName = req.body.data.customer.name;
+      console.log("Working");
+      /*const userName = req.body.data.customer.name;
       const userPhone = `+91${req.body.data.customer.phone_number}`
       const userMessage = req.body.data.message.message;
 
       console.log("Name", userName);
       console.log("Phone", userPhone);
 
-      const packageName = userMessage;//.trim();
+      const packageName = userMessage;.trim();
 
       const { data: pkg, error: pkgError } = await supabase
       .from('packages')
@@ -139,11 +140,11 @@ app.post("/webhook", async (req, res) => {
     if (pkgError) throw pkgError;
     if (!pkg) return res.status(404).json({ error: 'Package not found' });
 
-    const packageAmount = pkg.package_adv_amt
+    const packageAmount = pkg.package_adv_amt */
 
 //******************/
 
-    const amount = pkg.package_adv_amt * 100;
+  /*  const amount = pkg.package_adv_amt * 100;
 
     const response = await axios.post(
       'https://api.razorpay.com/v1/payment_links',
@@ -171,18 +172,18 @@ app.post("/webhook", async (req, res) => {
     });
 
     const paymentLink = response.data.short_url;
-    const responseMessage = `Thank you for choosingus! To confirm your booking, please complete the payment of ₹${packageAmount} using the link: ${paymentLink}.`;
+    const responseMessage = `Thank you for choosingus! To confirm your booking, please complete the payment of ₹${packageAmount} using the link: ${paymentLink}.`; */
 
     //*********** */
 
-        await sendWhatsAppMessage(userPhone, responseMessage);
+       /* await sendWhatsAppMessage(userPhone, responseMessage);
 
       console.log("Incoming Webhook Data:", userMessage); // Print response in console
       res.status(200).send("Webhook received");
   } catch (error) {
       console.error("Error processing webhook:", error);
-      res.status(500).send("Internal Server Error");
-  }
+      res.status(500).send("Internal Server Error");*/
+  } 
 });
 
 const sendWhatsAppMessage = async (phone, message) => {
