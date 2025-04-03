@@ -7,7 +7,7 @@ import { createClient } from '@supabase/supabase-js'; // Missing supabase client
 import fetch from 'node-fetch'; // Missing fetch import
 import crypto from 'crypto';
 
-const { google } = require("googleapis");
+import { google } from "googleapis";
 
 dotenv.config();
 
