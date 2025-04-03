@@ -125,6 +125,7 @@ app.post("/webhook", async (req, res) => {
 
       console.log("Working");
       console.log("Incoming Webhook Data:", req.body);
+      console.log("Customer Traits:", req.body.data.customer.traits);
       
       const data = req.body.data;
       if(!data || !data.customer || !data.message){
