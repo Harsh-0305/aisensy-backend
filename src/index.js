@@ -435,12 +435,7 @@ if (missingFields.length > 0) {
   process.exit(1);
 }
 
-// 3. Initialize Google Auth
-const auth = new google.auth.GoogleAuth({
-  credentials: credentialsJSON,
-  scopes: ["https://www.googleapis.com/auth/spreadsheets"],
-});
-
+// 3. Initialize Google Aut
 // 4. Test authentication
 (async () => {
   try {
