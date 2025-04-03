@@ -127,7 +127,7 @@ app.post("/webhook", async (req, res) => {
   try {
 
       console.log("Working");
-      res.status(200);
+      res.status(200).send("OK");
 
       /*
       console.log("Incoming Webhook Data:", req.body);
