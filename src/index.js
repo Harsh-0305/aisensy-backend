@@ -122,6 +122,12 @@ app.post("/webhook", async (req, res) => {
   try {
 
       console.log("Working");
+      
+      const data = req.body.data;
+      if(!data || !data.customer || !data.message){
+        return res.status(400).json({ error: "Invalid webhook data" });
+      }
+
       const userName = req.body.data.customer.name;
       const userPhone = `+91${req.body.data.customer.phone_number}`
       const userMessage = req.body.data.message.message;
@@ -137,8 +143,14 @@ app.post("/webhook", async (req, res) => {
       .eq('package_name', packageName)
       .single();
 
-    if (pkgError) throw pkgError;
-    if (!pkg) return res.status(404).json({ error: 'Package not found' });
+    if (pkgError) {
+      console.error("Supabase query error:",pkgError);
+      return res.status(500).json({error: "Database error"});
+    }
+    if (!pkg) {
+      console.warn("Package not found:", packageName);
+      return res.status(404).json({ error: 'Package not found' });
+    }
 
     const packageAmount = pkg.package_adv_amt 
 
@@ -176,10 +188,13 @@ app.post("/webhook", async (req, res) => {
 
     //*********** */
 
-        await sendWhatsAppMessage(userPhone, responseMessage);
+    const messageSent = await sendWhatsAppMessage(userPhone, responseMessage);
+    if (!messageSent) {
+        return res.status(500).json({ error: "Failed to send WhatsApp message" });
+    }
 
       console.log("Incoming Webhook Data:", userMessage); // Print response in console
-      res.status(200).send("Webhook received");
+      
   } catch (error) {
       console.error("Error processing webhook:", error);
       res.status(500).send("Internal Server Error");
