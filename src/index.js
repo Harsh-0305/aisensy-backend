@@ -6,9 +6,9 @@ import { getPackageById } from './services/packageService.js';
 import { createClient } from '@supabase/supabase-js'; // Missing supabase client
 import fetch from 'node-fetch'; // Missing fetch import
 import crypto from 'crypto';
-import sheets from "./config/googleAuth";
+import sheets from "./config/googleAuth.js";
 
-import auth from "./config/googleAuth"; // Adjust the path if needed
+import auth from "./config/googleAuth.js"; // Adjust the path if needed
 import { google } from "googleapis";
 
 dotenv.config();
