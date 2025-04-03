@@ -411,62 +411,72 @@ const sendPaymentWhatsAppMessage = async (amount,userPhone,userName,paymentLink)
 
 async function updateSheet(sheetName, data) {
   try {
-      const spreadsheetId = process.env.SPREADSHEET_ID;
-      if (!spreadsheetId) throw new Error("SPREADSHEET_ID environment variable is missing");
-      
-      // Ensure data is an array of arrays (even if single row)
-      const values = Array.isArray(data) ? data : [data];
-      
-      await sheets.spreadsheets.values.append({
-          spreadsheetId,
-          range: `${sheetName}!A1`,
-          valueInputOption: "RAW",
-          insertDataOption: "INSERT_ROWS",
-          resource: { values },
-      });
-      console.log(`✅ Data synced to ${sheetName}`);
+    const spreadsheetId = process.env.SPREADSHEET_ID;
+    if (!spreadsheetId) throw new Error("SPREADSHEET_ID is missing");
+    
+    await sheets.spreadsheets.values.append({
+      spreadsheetId,
+      range: `${sheetName}!A1`,
+      valueInputOption: "RAW",
+      insertDataOption: "INSERT_ROWS",
+      resource: { 
+        values: [data] // data should already be an array
+      },
+    });
+    console.log(`✅ Data synced to ${sheetName}`);
   } catch (error) {
-      console.error(`❌ Error updating ${sheetName}:`, error.message);
-      throw error; // Re-throw to handle in the webhook
+    console.error(`❌ Error updating ${sheetName}:`, error.message);
+    throw error;
   }
 }
 
 app.post("/packages-webhook", async (req, res) => {
   try {
-      console.log("Received webhook data from supabase:", req.body);
+    console.log("Received webhook data from supabase:", JSON.stringify(req.body, null, 2));
 
-      const { table, record } = req.body;
-      
-      if (!table || !record) {
-          throw new Error("Invalid webhook payload - missing table or record");
+    const { table, record } = req.body;
+    
+    if (!table || !record) {
+      throw new Error("Missing table or record in webhook payload");
+    }
+
+    // Define the expected column order for each table
+    const columnOrders = {
+      packages: [
+        'package_id',
+        'package_name',
+        'package_rm_amt',
+        'package_adv_amt',
+        'package_exp_date',
+        'package_ttl_amount'
+      ],
+      bookings: [/* your booking columns here */],
+      users: [/* your user columns here */]
+    };
+
+    // Get the correct column order for this table
+    const columns = columnOrders[table];
+    if (!columns) {
+      throw new Error(`Unsupported table: ${table}`);
+    }
+
+    // Create row data in the correct order
+    const rowData = columns.map(column => {
+      const value = record[column];
+      if (value === undefined) {
+        console.warn(`Missing column ${column} in record`);
+        return ''; // Return empty string for missing values
       }
+      return value;
+    });
 
-      // Convert record to array of values in a consistent order
-      const rowData = Object.keys(record).sort().map(key => record[key]);
-      
-      // Validate we have data
-      if (rowData.length === 0) {
-          throw new Error("No data extracted from record");
-      }
+    console.log("Processed row data:", rowData);
 
-      switch (table) {
-          case "bookings":
-              await updateSheet("Bookings", rowData);
-              break;
-          case "packages":
-              await updateSheet("Packages", rowData);
-              break;
-          case "users":
-              await updateSheet("Users", rowData);
-              break;
-          default:
-              console.warn(`Unknown table: ${table}`);
-      }
-
-      res.status(200).send("Data synced to Google Sheets");
+    await updateSheet(table.charAt(0).toUpperCase() + table.slice(1), rowData);
+    res.status(200).send("Data synced to Google Sheets");
   } catch (error) {
-      console.error("Webhook processing error:", error.message);
-      res.status(500).send(`Error processing webhook: ${error.message}`);
+    console.error("Webhook processing error:", error.message);
+    res.status(500).send(`Error processing webhook: ${error.message}`);
   }
 });
 
