@@ -327,12 +327,12 @@ const sendPaymentWhatsAppMessage = async (amount,userPhone,userName,paymentLink)
 };
 */
 
-const auth = new google.auth.GoogleAuth({
-  keyFile: "credentials.json", // Ensure you have your Google service account JSON file
-  scopes: ["https://www.googleapis.com/auth/spreadsheets"]
-});
+//const auth = new google.auth.GoogleAuth({
+//  keyFile: "credentials.json", // Ensure you have your Google service account JSON file
+//  scopes: ["https://www.googleapis.com/auth/spreadsheets"]
+//});
 
-const sheets = google.sheets({ version: "v4", auth });
+//const sheets = google.sheets({ version: "v4", auth });
 
 async function updateSheet(sheetName, data) {
   try {
