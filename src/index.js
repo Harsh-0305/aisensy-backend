@@ -127,9 +127,6 @@ app.post("/webhook", async (req, res) => {
   try {
 
       console.log("Working");
-      res.status(200).send("OK");
-
-      /*
       console.log("Incoming Webhook Data:", req.body);
       console.log("Customer Traits:", req.body.data.customer.traits);
       
@@ -201,7 +198,7 @@ app.post("/webhook", async (req, res) => {
       res.status(200).json({
         paymentLink: response.data.short_url,
         paymentId: response.data.id
-      }); */// Print response in console
+      }); // Print response in console
       
   } catch (error) {
       console.error("Error processing webhook:", error);
