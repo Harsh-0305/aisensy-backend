@@ -412,16 +412,22 @@ const sendPaymentWhatsAppMessage = async (amount,userPhone,userName,paymentLink)
 async function updateSheet(sheetName, data) {
   try {
       const spreadsheetId = process.env.SPREADSHEET_ID;
+      if (!spreadsheetId) throw new Error("SPREADSHEET_ID environment variable is missing");
+      
+      // Ensure data is an array of arrays (even if single row)
+      const values = Array.isArray(data) ? data : [data];
+      
       await sheets.spreadsheets.values.append({
           spreadsheetId,
           range: `${sheetName}!A1`,
           valueInputOption: "RAW",
           insertDataOption: "INSERT_ROWS",
-          resource: { values: [data] },
+          resource: { values },
       });
       console.log(`✅ Data synced to ${sheetName}`);
   } catch (error) {
-      console.error(`❌ Error updating ${sheetName}:`, error);
+      console.error(`❌ Error updating ${sheetName}:`, error.message);
+      throw error; // Re-throw to handle in the webhook
   }
 }
 
@@ -429,20 +435,40 @@ app.post("/packages-webhook", async (req, res) => {
   try {
       console.log("Received webhook data from supabase:", req.body);
 
-      const { table, record } = req.body; // Supabase sends table name & new record
-      const rowData = Object.values(record); // Convert object to array
+      const { table, record } = req.body;
+      
+      if (!table || !record) {
+          throw new Error("Invalid webhook payload - missing table or record");
+      }
 
-      if (table === "bookings") await updateSheet("Bookings", rowData);
-      if (table === "packages") await updateSheet("Packages", rowData);
-      if (table === "users") await updateSheet("Users", rowData);
+      // Convert record to array of values in a consistent order
+      const rowData = Object.keys(record).sort().map(key => record[key]);
+      
+      // Validate we have data
+      if (rowData.length === 0) {
+          throw new Error("No data extracted from record");
+      }
+
+      switch (table) {
+          case "bookings":
+              await updateSheet("Bookings", rowData);
+              break;
+          case "packages":
+              await updateSheet("Packages", rowData);
+              break;
+          case "users":
+              await updateSheet("Users", rowData);
+              break;
+          default:
+              console.warn(`Unknown table: ${table}`);
+      }
 
       res.status(200).send("Data synced to Google Sheets");
   } catch (error) {
-      console.error("Webhook processing error:", error);
-      res.status(500).send("Error processing webhook");
+      console.error("Webhook processing error:", error.message);
+      res.status(500).send(`Error processing webhook: ${error.message}`);
   }
 });
-
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
