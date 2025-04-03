@@ -14,7 +14,7 @@ try {
     Buffer.from(credentialsBase64, "base64").toString("utf8")
   );
 } catch (error) {
-  console.error("❌ Failed to decode/parse GOOGLE_CREDENTIALS:", error.message);
+  console.error("Failed to decode/parse GOOGLE_CREDENTIALS:", error.message);
   process.exit(1);
 }
 
