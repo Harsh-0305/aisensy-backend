@@ -127,10 +127,88 @@ app.post("/webhook", async (req, res) => {
   try {
 
       console.log("Working");
-      res.status(200);}
-      catch (error) {
-      console.error("Error sending message:", error.response ? error.response.data : error);
-  }
+      res.status(200);
+
+      /*
+      console.log("Incoming Webhook Data:", req.body);
+      console.log("Customer Traits:", req.body.data.customer.traits);
+      
+      const data = req.body.data;
+      if(!data || !data.customer || !data.message){
+        return res.status(400).json({ error: "Invalid webhook data" });
+      }
+
+      const userName = req.body.data.customer.traits?.name || "Unknown User";
+      const userPhone = `+91${req.body.data.customer.phone_number}`
+      const userMessage = req.body.data.message.message;
+
+      console.log("Name", userName);
+      console.log("Phone", userPhone);
+
+      const packageName = userMessage.trim();
+
+      const { data: pkg, error: pkgError } = await supabase
+      .from('packages')
+      .select('package_adv_amt')
+      .eq('package_name', packageName)
+      .single();
+
+    if (pkgError) {
+      console.error("Supabase query error:",pkgError);
+      return res.status(500).json({error: "Database error"});
+    }
+    if (!pkg) {
+      console.warn("Package not found:", packageName);
+      return res.status(404).json({ error: 'Package not found' });
+    }
+
+    const packageAmount = pkg.package_adv_amt 
+
+
+    const amount = pkg.package_adv_amt * 100;
+
+    const response = await axios.post(
+      'https://api.razorpay.com/v1/payment_links',
+      {
+        amount: amount,
+        currency: 'INR',
+        description: `Payment for ${packageName}`,
+        customer: {
+          name: "Harshh",
+          contact: userPhone
+        },
+        notify: { sms: true }
+      },
+      {
+        auth: {
+          username: process.env.RAZORPAY_KEY_ID,
+          password: process.env.RAZORPAY_KEY_SECRET
+        }
+      }
+    );
+
+    const paymentLink = response.data.short_url;
+    const responseMessage = `Thank you for choosingus! To confirm your booking, please complete the payment of ₹${packageAmount} using the link: ${paymentLink}.`; 
+
+    const messageSent = await sendWhatsAppMessage(userPhone, responseMessage);
+
+
+    if (!messageSent) {
+        return res.status(500).json({ error: "Failed to send WhatsApp message" });
+    }
+
+      console.log("Incoming Webhook Data:", userMessage);
+      res.status(200).json({
+        paymentLink: response.data.short_url,
+        paymentId: response.data.id
+      }); */// Print response in console
+      
+  } catch (error) {
+      console.error("Error processing webhook:", error);
+      if (!res.headersSent) {
+        res.status(500).send("Internal Server Error");
+    }
+  } 
 });
 
 const sendWhatsAppMessage = async (phone, message) => {
@@ -327,12 +405,12 @@ const sendPaymentWhatsAppMessage = async (amount,userPhone,userName,paymentLink)
 };
 */
 
-//const auth = new google.auth.GoogleAuth({
-//  keyFile: "credentials.json", // Ensure you have your Google service account JSON file
-//  scopes: ["https://www.googleapis.com/auth/spreadsheets"]
-//});
+/*const auth = new google.auth.GoogleAuth({
+  keyFile: "credentials.json", // Ensure you have your Google service account JSON file
+  scopes: ["https://www.googleapis.com/auth/spreadsheets"]
+});*/
 
-//const sheets = google.sheets({ version: "v4", auth });
+const sheets = google.sheets({ version: "v4", auth });
 
 async function updateSheet(sheetName, data) {
   try {
