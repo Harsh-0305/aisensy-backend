@@ -48,6 +48,8 @@ app.get('/get-package-amount', async (req, res) => {
 
 app.post('/create-payment-link', async (req, res) => {
   try {
+
+    
     const { userName, userPhone, packageName } = req.body;
 
     if (!userName || !userPhone || !packageName) {
@@ -122,6 +124,7 @@ app.post("/webhook", async (req, res) => {
   try {
 
       console.log("Working");
+      console.log("Incoming Webhook Data:", req.body);
       
       const data = req.body.data;
       if(!data || !data.customer || !data.message){
