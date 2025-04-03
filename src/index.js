@@ -178,26 +178,29 @@ app.post("/webhook", async (req, res) => {
       }
     );
 
-    res.status(200).json({
-      paymentLink: response.data.short_url,
-      paymentId: response.data.id
-    });
-
     const paymentLink = response.data.short_url;
     const responseMessage = `Thank you for choosingus! To confirm your booking, please complete the payment of ₹${packageAmount} using the link: ${paymentLink}.`; 
 
     //*********** */
 
     const messageSent = await sendWhatsAppMessage(userPhone, responseMessage);
+
+
     if (!messageSent) {
         return res.status(500).json({ error: "Failed to send WhatsApp message" });
     }
 
-      console.log("Incoming Webhook Data:", userMessage); // Print response in console
+      console.log("Incoming Webhook Data:", userMessage);
+      res.status(200).json({
+        paymentLink: response.data.short_url,
+        paymentId: response.data.id
+      }); // Print response in console
       
   } catch (error) {
       console.error("Error processing webhook:", error);
-      res.status(500).send("Internal Server Error");
+      if (!res.headersSent) {
+        res.status(500).send("Internal Server Error");
+    }
   } 
 });
 
