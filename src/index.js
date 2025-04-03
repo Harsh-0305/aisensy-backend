@@ -132,7 +132,7 @@ app.post("/webhook", async (req, res) => {
         return res.status(400).json({ error: "Invalid webhook data" });
       }
 
-      const userName = req.body.data.customer.name;
+      const userName = req.body.data.customer.traits?.name || "Unknown User";
       const userPhone = `+91${req.body.data.customer.phone_number}`
       const userMessage = req.body.data.message.message;
 
@@ -401,6 +401,47 @@ const sendPaymentWhatsAppMessage = async (amount,userPhone,userName,paymentLink)
   }
 };
 */
+
+const auth = new google.auth.GoogleAuth({
+  keyFile: "credentials.json", // Ensure you have your Google service account JSON file
+  scopes: ["https://www.googleapis.com/auth/spreadsheets"]
+});
+
+const sheets = google.sheets({ version: "v4", auth });
+
+async function updateSheet(sheetName, data) {
+  try {
+      const spreadsheetId = process.env.SPREADSHEET_ID;
+      await sheets.spreadsheets.values.append({
+          spreadsheetId,
+          range: `${sheetName}!A1`,
+          valueInputOption: "RAW",
+          insertDataOption: "INSERT_ROWS",
+          resource: { values: [data] },
+      });
+      console.log(`✅ Data synced to ${sheetName}`);
+  } catch (error) {
+      console.error(`❌ Error updating ${sheetName}:`, error);
+  }
+}
+
+app.post("/packages-webhook", async (req, res) => {
+  try {
+      console.log("Received webhook data from supabase:", req.body);
+
+      const { table, record } = req.body; // Supabase sends table name & new record
+      const rowData = Object.values(record); // Convert object to array
+
+      if (table === "bookings") await updateSheet("Bookings", rowData);
+      if (table === "packages") await updateSheet("Packages", rowData);
+      if (table === "users") await updateSheet("Users", rowData);
+
+      res.status(200).send("Data synced to Google Sheets");
+  } catch (error) {
+      console.error("Webhook processing error:", error);
+      res.status(500).send("Error processing webhook");
+  }
+});
 
 
 const PORT = process.env.PORT || 3000;
