@@ -182,12 +182,10 @@ app.post("/webhook", async (req, res) => {
 
     const paymentLink = response.data.short_url;
     const responseMessage1 = `Thank you for choosingus! To confirm your booking, please complete the payment of ₹${packageAmount} using the link: ${paymentLink}.`; 
-    const responseMessage2 = `A booking payment has been received of ₹${packageAmount} for ${packageName} from ${userName}`; 
-
-    const adminPhone = "918094556379";
 
     const messageSent1 = await sendWhatsAppMessage(userPhone, responseMessage1);
-    const messageSent2 = await sendWhatsAppMessage(adminPhone, responseMessage2);
+
+   
 
 
 
@@ -291,7 +289,13 @@ app.post('/razorpaywebhook', async (req, res) => {
       // Send WhatsApp message
 
       const responseMessage2 = `Your payment has been received.\n Payment Id: ${paymentId}`;
+      const responseMessage3 = `A booking payment has been received of ₹${pkg2.package_adv_amt} for ${packageName} from ${userName}`;
+
+      const adminPhone = "918094556379";
+      
+
       await sendWhatsAppMessage(userPhone, responseMessage2);
+      await sendWhatsAppMessage(adminPhone, responseMessage3);
       
 
       //await sendConfirmationWhatsAppMessage(userPhone, userFirstName, packageName, paymentId, amount);
@@ -357,14 +361,11 @@ app.post('/razorpaywebhook', async (req, res) => {
 
      // 🔹 Step 5: Update User's booked_package in users table
      const { error: updateUserError } = await supabase
-     .from('users')
-     .update({ 
-       booked_package: supabase.rpc('array_append', {
-         column: 'booked_package',  // column name
-         value: packageName          // value to append
-       })
-     })
-     .eq('user_id', user.user_id); // For the specific user
+  .from('users')
+  .update({ 
+    booked_package: [packageName] // Wrap in array
+  })
+  .eq('user_id', user.user_id); // For the specific user
 
 if (updateUserError) {
   console.error('Error updating user booked package:', updateUserError);
