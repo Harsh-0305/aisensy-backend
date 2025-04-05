@@ -6,10 +6,6 @@ import { getPackageById } from './services/packageService.js';
 import { createClient } from '@supabase/supabase-js'; // Missing supabase client
 import fetch from 'node-fetch'; // Missing fetch import
 import crypto from 'crypto';
-import sheets from "./config/googleAuth.js";
-
-import auth from "./config/googleAuth.js"; // Adjust the path if needed
-import { google } from "googleapis";
 
 dotenv.config();
 
@@ -287,6 +283,7 @@ app.post('/razorpaywebhook', async (req, res) => {
 
       const responseMessage2 = `Your payment has been received.\n Payment Id: ${paymentId}`;
       await sendWhatsAppMessage(userPhone, responseMessage2);
+      
 
       //await sendConfirmationWhatsAppMessage(userPhone, userFirstName, packageName, paymentId, amount);
 
@@ -409,131 +406,7 @@ const sendPaymentWhatsAppMessage = async (amount,userPhone,userName,paymentLink)
 
 //const sheets = google.sheets({ version: "v4", auth });
 
-const credentialsBase64 = process.env.GOOGLE_CREDENTIALS;
 
-if (!credentialsBase64) {
-  console.error("❌ GOOGLE_CREDENTIALS environment variable is missing.");
-  process.exit(1);
-}
-
-let credentialsJSON;
-try {
-  credentialsJSON = JSON.parse(
-    Buffer.from(credentialsBase64, "base64").toString("utf8")
-  );
-} catch (error) {
-  console.error("❌ Failed to decode/parse GOOGLE_CREDENTIALS:", error.message);
-  process.exit(1);
-}
-
-// 2. Validate required fields
-const requiredFields = ["client_email", "private_key", "project_id"];
-const missingFields = requiredFields.filter((field) => !credentialsJSON[field]);
-
-if (missingFields.length > 0) {
-  console.error("❌ Missing required credential fields:", missingFields.join(", "));
-  process.exit(1);
-}
-
-// 3. Initialize Google Aut
-// 4. Test authentication
-(async () => {
-  try {
-    console.log("🔹 Attempting Google Sheets authentication...");
-    
-    // Get the auth client
-    const authClient = await auth.getClient();
-    console.log("✅ Auth client created successfully.");
-
-    // Test listing spreadsheets (optional)
-    const sheets = google.sheets({ version: "v4", auth: authClient });
-    const response = await sheets.spreadsheets.get({
-      spreadsheetId: process.env.SPREADSHEET_ID, // Optional: Test with a real Sheet ID
-      fields: "spreadsheetId,properties.title",
-    });
-
-    console.log("✅ Successfully accessed Google Sheets API!");
-    console.log("📄 Spreadsheet Title:", response.data.properties.title);
-    console.log("🆔 Spreadsheet ID:", response.data.spreadsheetId);
-  } catch (error) {
-    console.error("❌ Authentication or API access failed:", error.message);
-    if (error.response?.data) {
-      console.error("🔍 Details:", JSON.stringify(error.response.data, null, 2));
-    }
-    process.exit(1);
-  }
-})();
-
-async function updateSheet(sheetName, data) {
-  try {
-    const spreadsheetId = process.env.SPREADSHEET_ID;
-    if (!spreadsheetId) throw new Error("SPREADSHEET_ID is missing");
-    
-    await sheets.spreadsheets.values.append({
-      spreadsheetId,
-      range: `${sheetName}!A1`,
-      valueInputOption: "RAW",
-      insertDataOption: "INSERT_ROWS",
-      resource: { 
-        values: [data] // data should already be an array
-      },
-    });
-    console.log(`✅ Data synced to ${sheetName}`);
-  } catch (error) {
-    console.error(`❌ Error updating ${sheetName}:`, error.message);
-    throw error;
-  }
-}
-
-app.post("/packages-webhook", async (req, res) => {
-  try {
-    console.log("Received webhook data from supabase:", JSON.stringify(req.body, null, 2));
-
-    const { table, record } = req.body;
-    
-    if (!table || !record) {
-      throw new Error("Missing table or record in webhook payload");
-    }
-
-    // Define the expected column order for each table
-    const columnOrders = {
-      packages: [
-        'package_id',
-        'package_name',
-        'package_rm_amt',
-        'package_adv_amt',
-        'package_exp_date',
-        'package_ttl_amount'
-      ],
-      bookings: [/* your booking columns here */],
-      users: [/* your user columns here */]
-    };
-
-    // Get the correct column order for this table
-    const columns = columnOrders[table];
-    if (!columns) {
-      throw new Error(`Unsupported table: ${table}`);
-    }
-
-    // Create row data in the correct order
-    const rowData = columns.map(column => {
-      const value = record[column];
-      if (value === undefined) {
-        console.warn(`Missing column ${column} in record`);
-        return ''; // Return empty string for missing values
-      }
-      return value;
-    });
-
-    console.log("Processed row data:", rowData);
-
-    await updateSheet(table.charAt(0).toUpperCase() + table.slice(1), rowData);
-    res.status(200).send("Data synced to Google Sheets");
-  } catch (error) {
-    console.error("Webhook processing error:", error.message);
-    res.status(500).send(`Error processing webhook: ${error.message}`);
-  }
-});
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
