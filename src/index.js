@@ -135,10 +135,21 @@ app.post("/webhook", async (req, res) => {
       const userPhone = `+91${req.body.data.customer.phone_number}`
       const userMessage = req.body.data.message.message;
 
+      const keyword = "book ";
+      const index = userMessagemessage.toLowerCase().indexOf(keyword);
+      
+      let userPackage = "";
+      
+      if (index !== -1) {
+        userPackage = userMessagemessage.slice(index + keyword.length).trim();
+      }
+      
+
+
       console.log("Name", userName);
       console.log("Phone", userPhone);
 
-      const packageName = userMessage.trim();
+      const packageName = userPackage.trim();
 
       const { data: pkg, error: pkgError } = await supabase
       .from('packages')
