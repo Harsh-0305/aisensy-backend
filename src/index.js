@@ -136,12 +136,12 @@ app.post("/webhook", async (req, res) => {
       const userMessage = req.body.data.message.message;
 
       const keyword = "book ";
-      const index = userMessagemessage.toLowerCase().indexOf(keyword);
+      const index = userMessage.toLowerCase().indexOf(keyword);
       
       let userPackage = "";
       
       if (index !== -1) {
-        userPackage = userMessagemessage.slice(index + keyword.length).trim();
+        userPackage = userMessage.slice(index + keyword.length).trim();
       }
       
 
