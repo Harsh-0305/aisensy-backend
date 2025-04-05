@@ -360,17 +360,18 @@ app.post('/razorpaywebhook', async (req, res) => {
       }
 
      // 🔹 Step 5: Update User's booked_package in users table
-     const { error: updateUserError } = await supabase
+     const { error: updateError } = await supabase
   .from('users')
-  .update({ 
-    booked_package: [packageName] // Wrap in array
+  .update({
+    booked_package: supabase.rpc('array_append', {
+      column: 'booked_package',  // Column name (PostgreSQL array)
+      value: packageName          // New value to append
+    })
   })
-  .eq('user_id', user.user_id); // For the specific user
+  .eq('user_id', user.user_id);
 
-if (updateUserError) {
-  console.error('Error updating user booked package:', updateUserError);
-  // You might choose to continue even if this fails, since the booking was created successfully
-  // return res.status(500).json({ error: 'Failed to update user package' });
+if (updateError) {
+  console.error('Failed to append package:', updateError);
 }
 
 
