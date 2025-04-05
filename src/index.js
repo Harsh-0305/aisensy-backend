@@ -136,7 +136,7 @@ app.post("/webhook", async (req, res) => {
       const userMessage = req.body.data.message.message;
 
       const keyword = "ID: ";
-      const index = userMessage.toLowerCase().indexOf(keyword);
+      const index = userMessage.indexOf(keyword);
       
       let userPackageId = "";
       
