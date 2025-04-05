@@ -135,14 +135,22 @@ app.post("/webhook", async (req, res) => {
       const userPhone = `+91${req.body.data.customer.phone_number}`
       const userMessage = req.body.data.message.message;
 
-      const keyword = "ID: ";
+      /*const keyword = "ID: ";
       const index = userMessage.indexOf(keyword);
       
       let userPackageId = "";
       
       if (index !== -1) {
         userPackageId = userMessage.slice(index + keyword.length).trim();
-      }
+      }*/
+
+        const match = userMessage.match(/\(?\s*ID[:\s]*([A-Z0-9]+)\s*\)?/i);
+
+let userPackageId = "";
+
+if (match && match[1]) {
+  userPackageId = match[1];
+}
       
 
 
