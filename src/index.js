@@ -135,26 +135,29 @@ app.post("/webhook", async (req, res) => {
       const userPhone = `+91${req.body.data.customer.phone_number}`
       const userMessage = req.body.data.message.message;
 
-      const keyword = "book ";
+      const keyword = "ID: ";
       const index = userMessage.toLowerCase().indexOf(keyword);
       
-      let userPackage = "";
+      let userPackageId = "";
       
       if (index !== -1) {
-        userPackage = userMessage.slice(index + keyword.length).trim();
+        userPackageId = userMessage.slice(index + keyword.length).trim();
       }
       
 
 
       console.log("Name", userName);
       console.log("Phone", userPhone);
+      console.log("Package Id", userPackageId);
 
-      const packageName = userPackage.trim();
+
+
+      const packageNameId = userPackageId.trim();
 
       const { data: pkg, error: pkgError } = await supabase
       .from('packages')
-      .select('package_adv_amt')
-      .eq('package_name', packageName)
+      .select('package_adv_amt,package_name')
+      .eq('package_id', packageNameId)
       .single();
 
     if (pkgError) {
@@ -167,6 +170,7 @@ app.post("/webhook", async (req, res) => {
     }
 
     const packageAmount = pkg.package_adv_amt 
+    const packageName = pkg.package_name
 
 
     const amount = pkg.package_adv_amt * 100;
