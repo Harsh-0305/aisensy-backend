@@ -244,7 +244,8 @@ const sendWhatsAppMessage = async (phone, message) => {
             callbackData: "response_sent",
             type: "Text",
             data: {
-                message: message
+                message: message,
+                preview_url: false
             }
           },
           {
