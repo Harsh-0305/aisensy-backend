@@ -182,7 +182,7 @@ app.post("/webhook", async (req, res) => {
 
     const paymentLink = response.data.short_url;
     const responseMessage1 = `Thank you for choosingus! To confirm your booking, please complete the payment of ₹${packageAmount} using the link: ${paymentLink}.`; 
-    const responseMessage2 = `A booking payment has been received of ₹${packageAmount} for ${packageName}`; 
+    const responseMessage2 = `A booking payment has been received of ₹${packageAmount} for ${packageName} from ${userName}`; 
 
     const adminPhone = "918094556379";
 
@@ -354,6 +354,24 @@ app.post('/razorpaywebhook', async (req, res) => {
         console.error('Error inserting booking:', bookingError);
         return res.status(500).json({ error: 'Failed to insert booking' });
       }
+
+     // 🔹 Step 5: Update User's booked_package in users table
+     const { error: updateUserError } = await supabase
+     .from('users')
+     .update({ 
+       booked_package: supabase.rpc('array_append', {
+         column: 'booked_package',  // column name
+         value: packageName          // value to append
+       })
+     })
+     .eq('user_id', user.user_id); // For the specific user
+
+if (updateUserError) {
+  console.error('Error updating user booked package:', updateUserError);
+  // You might choose to continue even if this fails, since the booking was created successfully
+  // return res.status(500).json({ error: 'Failed to update user package' });
+}
+
 
       console.log(`✅ Booking inserted successfully for ${userName}`);
 
