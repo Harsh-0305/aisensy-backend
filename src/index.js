@@ -181,14 +181,23 @@ app.post("/webhook", async (req, res) => {
     );
 
     const paymentLink = response.data.short_url;
-    const responseMessage = `Thank you for choosingus! To confirm your booking, please complete the payment of ₹${packageAmount} using the link: ${paymentLink}.`; 
+    const responseMessage1 = `Thank you for choosingus! To confirm your booking, please complete the payment of ₹${packageAmount} using the link: ${paymentLink}.`; 
+    const responseMessage2 = `A booking payment has been received of ₹${packageAmount} for ${packageName}`; 
 
-    const messageSent = await sendWhatsAppMessage(userPhone, responseMessage);
+    const adminPhone = "918094556379";
+
+    const messageSent1 = await sendWhatsAppMessage(userPhone, responseMessage1);
+    const messageSent2 = await sendWhatsAppMessage(adminPhone, responseMessage2);
 
 
-    if (!messageSent) {
-        return res.status(500).json({ error: "Failed to send WhatsApp message" });
+
+    if (!messageSent1) {
+        return res.status(500).json({ error: "Failed to send WhatsApp message to the customer" });
     }
+
+    if (!messageSent2) {
+      return res.status(500).json({ error: "Failed to send WhatsApp message to the admin" });
+  }
 
       console.log("Incoming Webhook Data:", userMessage);
       res.status(200).json({
@@ -335,6 +344,7 @@ app.post('/razorpaywebhook', async (req, res) => {
             booking_user_name: userName,
             booking_date: new Date().toISOString(),
             booking_package_id: pkg.package_id,
+            booking_package_name: packageName,
             booking_adv_status: 'Paid',
             booking_rm_status: 'Pending' // Assuming remaining payment is still pending
           }
