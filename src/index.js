@@ -275,7 +275,7 @@ const sendWhatsAppMessage2 = async (phone, imageUrl,  message) => {
         data: {
            // Public image URL (JPEG, PNG)
           caption: message,
-          mediaUrl: "https://oahorqgkqbcslflkqhiv.supabase.co/storage/v1/object/public/package-assets/static%20assets/Tripuva%20(7).png",
+          mediaUrl: "https://oahorqgkqbcslflkqhiv.supabase.co/storage/v1/object/public/package-assets/static%20assets/Tripuva%20(9).png",
           message: message
           // Optional caption
         }
