@@ -204,9 +204,9 @@ if (match && match[1]) {
     );
 
     const paymentLink = response.data.short_url;
-    const responseMessage1 = `Thank you for choosingus! To confirm your booking, please complete the payment of ₹${packageAmount} using the link: ${paymentLink}.`; 
+    const responseMessage1 = `🌟 Thank you for choosing us! To confirm your booking \n\n To proceed with your booking, please pay the advance amount of ₹${packageAmount} using the link below:\n ${paymentLink}\n Looking forward to hosting you! ✨🌍``; 
 
-    const messageSent1 = await sendWhatsAppMessage(userPhone," ", responseMessage1);
+    const messageSent1 = await sendWhatsAppMessage2(userPhone," ", responseMessage1);
 
    
 
@@ -234,8 +234,8 @@ if (match && match[1]) {
   } 
 });
 
-/*
-const sendWhatsAppMessage = async (phone, message) => {
+
+const sendWhatsAppMessage1 = async (phone, message) => {
   try {
       const response = await axios.post(
           "https://api.interakt.ai/v1/public/message/",
@@ -261,9 +261,9 @@ const sendWhatsAppMessage = async (phone, message) => {
   } catch (error) {
       console.error("Error sending message:", error.response ? error.response.data : error);
   }
-};*/
+};
 
-const sendWhatsAppMessage = async (phone, imageUrl,  message) => {
+const sendWhatsAppMessage2 = async (phone, imageUrl,  message) => {
   try {
     const response = await axios.post(
       "https://api.interakt.ai/v1/public/message/",
@@ -275,7 +275,7 @@ const sendWhatsAppMessage = async (phone, imageUrl,  message) => {
         data: {
            // Public image URL (JPEG, PNG)
           caption: message,
-          mediaUrl: "https://oahorqgkqbcslflkqhiv.supabase.co/storage/v1/object/public/package-assets/static%20assets/homepage-background-image.jpg",
+          mediaUrl: "https://oahorqgkqbcslflkqhiv.supabase.co/storage/v1/object/public/package-assets/static%20assets/Tripuva%20(2).png",
           message: message
           // Optional caption
         }
@@ -351,8 +351,8 @@ app.post('/razorpaywebhook', async (req, res) => {
       const adminPhone = "918094556379";
       
 
-      await sendWhatsAppMessage(userPhone, responseMessage2);
-      await sendWhatsAppMessage(adminPhone, responseMessage3);
+      await sendWhatsAppMessage1(userPhone, responseMessage2);
+      await sendWhatsAppMessage1(adminPhone, responseMessage3);
       
 
       //await sendConfirmationWhatsAppMessage(userPhone, userFirstName, packageName, paymentId, amount);
