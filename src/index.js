@@ -204,7 +204,7 @@ if (match && match[1]) {
     );
 
     const paymentLink = response.data.short_url;
-    const responseMessage1 = `Thank you for choosing us!🌟\n\nTo proceed with your booking, please pay the advance amount of ₹${packageAmount} using the link:\n\n${paymentLink}\n\nLooking forward to hosting you! ✨🌍`; 
+    const responseMessage1 = `Thank you for choosing us! 🌟\n\nTo proceed with your booking, please pay the advance amount of ₹${packageAmount} using the link:\n\n${paymentLink}\n\nLooking forward to hosting you! ✨🌍`; 
 
     const messageSent1 = await sendWhatsAppMessage2(userPhone," ", responseMessage1);
 
@@ -275,7 +275,7 @@ const sendWhatsAppMessage2 = async (phone, imageUrl,  message) => {
         data: {
            // Public image URL (JPEG, PNG)
           caption: message,
-          mediaUrl: "https://oahorqgkqbcslflkqhiv.supabase.co/storage/v1/object/public/package-assets/static%20assets/Tripuva%20(2).png",
+          mediaUrl: "https://oahorqgkqbcslflkqhiv.supabase.co/storage/v1/object/public/package-assets/static%20assets/Tripuva%20(3).png",
           message: message
           // Optional caption
         }
