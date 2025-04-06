@@ -206,7 +206,7 @@ if (match && match[1]) {
     const paymentLink = response.data.short_url;
     const responseMessage1 = `Thank you for choosingus! To confirm your booking, please complete the payment of ₹${packageAmount} using the link: ${paymentLink}.`; 
 
-    const messageSent1 = await sendWhatsAppMessage(userPhone, responseMessage1);
+    const messageSent1 = await sendWhatsAppMessage(userPhone," ", responseMessage1);
 
    
 
