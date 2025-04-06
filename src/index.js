@@ -280,7 +280,7 @@ const sendWhatsAppMessage = async (phone, imageUrl,  message) => {
       {
         headers: {
           "Content-Type": "application/json",
-          "Authorization": "Basic YOUR_API_KEY_HERE"
+          "Authorization": "Basic dU9OWUI3bEtRbmFhM0t6VWViSWlBVVRyN09COG1sNENzdHVnalAtQkdBSTo="
         }
       }
     );
