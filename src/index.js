@@ -234,6 +234,7 @@ if (match && match[1]) {
   } 
 });
 
+/*
 const sendWhatsAppMessage = async (phone, message) => {
   try {
       const response = await axios.post(
@@ -260,7 +261,36 @@ const sendWhatsAppMessage = async (phone, message) => {
   } catch (error) {
       console.error("Error sending message:", error.response ? error.response.data : error);
   }
+};*/
+
+const sendWhatsAppMessage = async (phone, imageUrl,  message) => {
+  try {
+    const response = await axios.post(
+      "https://api.interakt.ai/v1/public/message/",
+      {
+        userId: "",
+        fullPhoneNumber: phone,
+        callbackData: "response_sent",
+        type: "Image",
+        data: {
+          url: "https://images.unsplash.com/photo-1469474968028-56623f02e42e?q=80&w=2074&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D", // Public image URL (JPEG, PNG)
+          caption: message // Optional caption
+        }
+      },
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Basic YOUR_API_KEY_HERE"
+        }
+      }
+    );
+
+    console.log("✅ Image sent successfully:", response.data);
+  } catch (error) {
+    console.error("❌ Error sending image:", error.response ? error.response.data : error);
+  }
 };
+
 
 
 
