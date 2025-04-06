@@ -144,7 +144,7 @@ app.post("/webhook", async (req, res) => {
         userPackageId = userMessage.slice(index + keyword.length).trim();
       }*/
 
-        const match = userMessage.match(/\(?\s*ID[:\s]*([A-Z0-9]+)\s*\)?/i);
+        const match = userMessage.match(/\(?\s*Experience\s*code[:\s]*([A-Z0-9]+)\s*\)?/i);
 
 let userPackageId = "";
 
@@ -275,7 +275,7 @@ const sendWhatsAppMessage2 = async (phone, imageUrl,  message) => {
         data: {
            // Public image URL (JPEG, PNG)
           caption: message,
-          mediaUrl: "https://oahorqgkqbcslflkqhiv.supabase.co/storage/v1/object/public/package-assets/static%20assets/Tripuva%20(3).png",
+          mediaUrl: "https://oahorqgkqbcslflkqhiv.supabase.co/storage/v1/object/public/package-assets/static%20assets/Tripuva%20(5).png",
           message: message
           // Optional caption
         }
@@ -345,7 +345,7 @@ app.post('/razorpaywebhook', async (req, res) => {
 
       // Send WhatsApp message
 
-      const responseMessage2 = `Your payment has been received.\n Payment Id: ${paymentId}`;
+      const responseMessage2 = ` ✅ Thank you for your payment.\nPayment Id: ${paymentId}\n\nWe’ll confirm your slot shortly and let you know the next steps.\n\nStay tuned 😊`;
       const responseMessage3 = `A booking payment has been received of ₹${pkg2.package_adv_amt} for ${packageName} from ${userName}`;
 
       const adminPhone = "918094556379";
