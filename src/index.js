@@ -273,7 +273,7 @@ const sendWhatsAppMessage = async (phone, imageUrl,  message) => {
         callbackData: "response_sent",
         type: "Image",
         data: {
-          url: "https://images.unsplash.com/photo-1469474968028-56623f02e42e?q=80&w=2074&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D", // Public image URL (JPEG, PNG)
+          url: "https://oahorqgkqbcslflkqhiv.supabase.co/storage/v1/object/public/package-assets/static%20assets/homepage-background-image.jpg", // Public image URL (JPEG, PNG)
           caption: message // Optional caption
         }
       },
