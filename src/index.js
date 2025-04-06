@@ -461,6 +461,7 @@ const sendPaymentWhatsAppMessage = async (amount,userPhone,userName,paymentLink)
 //const sheets = google.sheets({ version: "v4", auth });
 
 app.get('/health', (req, res) => {
+  console.log('Health check received at:', new Date().toISOString());
   res.status(200).send('OK');
 });
 
