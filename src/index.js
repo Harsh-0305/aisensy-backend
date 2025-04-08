@@ -146,6 +146,10 @@ app.post("/webhook", async (req, res) => {
 
         const match = userMessage.match(/\(?\s*Experience\s*code[:\s]*([A-Z0-9]+)\s*\)?/i);
 
+        const dateMatch = userMessage.match(/Preferred\s*Date[:\s]*([0-9]{2}-[A-Za-z]{3}-[0-9]{2})/i);
+
+        const preferredDate = dateMatch ? dateMatch[1] : null;
+
 let userPackageId = "";
 
 if (match && match[1]) {
@@ -157,6 +161,7 @@ if (match && match[1]) {
       console.log("Name", userName);
       console.log("Phone", userPhone);
       console.log("Package Id", userPackageId);
+      console.log("Preferred Date:",preferredDate);
 
 
 
