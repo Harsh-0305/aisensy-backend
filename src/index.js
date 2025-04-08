@@ -429,7 +429,8 @@ app.post('/razorpaywebhook', async (req, res) => {
             booking_package_id: pkg.package_id,
             booking_package_name: bookingPackageName,
             booking_adv_status: 'Paid',
-            booking_rm_status: 'Pending' // Assuming remaining payment is still pending
+            booking_package_start_date: bookingPackageDate,
+            booking_rm_status: 'Pending', // Assuming remaining payment is still pending
           }
         ]);
 
