@@ -341,8 +341,8 @@ app.post('/razorpaywebhook', async (req, res) => {
       console.log(`User Name: ${userName}`);
       console.log(`User Phone: ${userPhone}`);
       console.log(`Package Name: ${packageName}`);
-      console.log("Package:", ${bookingPackageName});
-      console.log("Date:", ${bookingPackageDate});
+      console.log(`Package:", ${bookingPackageName}`);
+      console.log(`Date:", ${bookingPackageDate}`);
 
       const nameParts = userName.split(' ');
 
