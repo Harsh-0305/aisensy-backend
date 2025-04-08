@@ -146,9 +146,9 @@ app.post("/webhook", async (req, res) => {
 
         const match = userMessage.match(/\(?\s*Experience\s*code[:\s]*([A-Z0-9]+)\s*\)?/i);
 
-        const dateMatch = userMessage.match(/Preferred\s*Date[:\s]*([0-9]{2}-[A-Za-z]{3}-[0-9]{2})/i);
+        const dateMatch = userMessage.match(/Trip\s*Date[:\s]*([0-9]{2}-[A-Za-z]{3}-[0-9]{2})/i);
 
-        const preferredDate = dateMatch ? dateMatch[1] : null;
+        const packageDate = dateMatch ? dateMatch[1] : null;
 
 let userPackageId = "";
 
@@ -161,7 +161,7 @@ if (match && match[1]) {
       console.log("Name", userName);
       console.log("Phone", userPhone);
       console.log("Package Id", userPackageId);
-      console.log("Preferred Date:",preferredDate);
+      console.log("Trip Date:",packageDate);
 
 
 
@@ -193,7 +193,7 @@ if (match && match[1]) {
       {
         amount: amount,
         currency: 'INR',
-        description: `Payment for ${packageName} and date: ${preferredDate} and Exp code: ${packageNameId}`,
+        description: `Payment for ${packageName} and date: ${packageDate} and Exp code: ${packageNameId}`,
         customer: {
           name: userName,
           contact: userPhone
