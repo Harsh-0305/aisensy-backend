@@ -193,7 +193,7 @@ if (match && match[1]) {
       {
         amount: amount,
         currency: 'INR',
-        description: `Payment for ${packageName} and date: ${preferredDate}`,
+        description: `Payment for ${packageName} and date: ${preferredDate} and Exp code: ${packageNameId}`,
         customer: {
           name: userName,
           contact: userPhone
@@ -326,12 +326,14 @@ app.post('/razorpaywebhook', async (req, res) => {
     
     const description = req.body.payload.payment_link.entity.description;
 
-    const bookingMatch = description.match(/^Payment for (.+?) and date: (.+)$/);
+    const bookingMatch = description.match(/^Payment for (.+?) and date: (.+?) and Exp code: (.+)$/i);
 
-    const bookingPackageName = bookingMatch[1].trim();
+      const bookingPackageName = bookingMatch[1].trim();
       const bookingPackageDate = bookingMatch[2].trim();
+      const bookingExpCode = bookingMatch[3].trim();
       console.log("Package:", bookingPackageName);
-      console.log("Date:", bookingPackageDate);  
+      console.log("Date:", bookingPackageDate);
+      
 
 
     // ✅ Process only if payment is successful
@@ -343,6 +345,7 @@ app.post('/razorpaywebhook', async (req, res) => {
       console.log(`Package Name: ${packageName}`);
       console.log(`Package:", ${bookingPackageName}`);
       console.log(`Date:", ${bookingPackageDate}`);
+      console.log(`Exp Code:", ${bookingExpCode}`);
 
       const nameParts = userName.split(' ');
 
@@ -352,13 +355,15 @@ app.post('/razorpaywebhook', async (req, res) => {
       const { data: pkg2, error: pkgError2 } = await supabase
       .from('packages')
       .select('package_adv_amt')
-      .eq('package_name', packageName)
+      .eq('package_id', bookingExpCode)
       .single();
 
     if (pkgError2) throw pkgError2;
     if (!pkg2) return res.status(404).json({ error: 'Package not found' });
 
     const amount = pkg2.package_adv_amt * 100; // Convert to paise
+
+    console.log(`Amount:", ${amount}`);
 
       // Send WhatsApp message
 
@@ -405,7 +410,7 @@ app.post('/razorpaywebhook', async (req, res) => {
       const { data: pkg, error: pkgError } = await supabase
         .from('packages')
         .select('package_id')
-        .eq('package_name', packageName)
+        .eq('package_name', bookingPackageName)
         .single();
 
       if (pkgError || !pkg) {
@@ -422,7 +427,7 @@ app.post('/razorpaywebhook', async (req, res) => {
             booking_user_name: userName,
             booking_date: new Date().toISOString(),
             booking_package_id: pkg.package_id,
-            booking_package_name: packageName,
+            booking_package_name: bookingPackageName,
             booking_adv_status: 'Paid',
             booking_rm_status: 'Pending' // Assuming remaining payment is still pending
           }
