@@ -329,8 +329,8 @@ app.post('/razorpaywebhook', async (req, res) => {
     const bookingMatch = description.match(/^Payment for (.+?) and date: (.+)$/);
 
     if (bookingMatch) {
-      const bookingPackageName = match[1].trim();
-      const bookingPackageDate = match[2].trim();
+      const bookingPackageName = bookingMatch[1].trim();
+      const bookingPackageDate = bookingMatch[2].trim();
       console.log("Package:", bookingPackageName);
       console.log("Date:", bookingPackageDate);  
     }
