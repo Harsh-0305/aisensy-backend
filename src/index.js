@@ -323,6 +323,18 @@ app.post('/razorpaywebhook', async (req, res) => {
     const userName = req.body.payload.payment_link.entity.customer.name;
     const userPhone = req.body.payload.payment_link.entity.customer.contact;
     const packageName = req.body.payload.payment_link.entity.description.replace("Payment for ", "");
+    
+    const description = req.body.payload.payment_link.entity.description;
+
+    const bookingMatch = description.match(/^Payment for (.+?) and date: (.+)$/);
+
+    if (bookingMatch) {
+      const bookingPackageName = match[1].trim();
+      const bookingPackageDate = match[2].trim();
+      console.log("Package:", bookingPackageName);
+      console.log("Date:", bookingPackageDate);  
+    }
+
 
     // ✅ Process only if payment is successful
     if (event === 'payment_link.paid' && status === 'paid') {
