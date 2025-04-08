@@ -193,7 +193,7 @@ if (match && match[1]) {
       {
         amount: amount,
         currency: 'INR',
-        description: `Payment for ${packageName}`,
+        description: `Payment for ${packageName} and date:${preferredDate}`,
         customer: {
           name: userName,
           contact: userPhone
