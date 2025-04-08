@@ -407,7 +407,7 @@ app.post('/razorpaywebhook', async (req, res) => {
       }
 
       // 🔹 Step 3: Get Package ID from Packages Table
-      const { data: pkg, error: pkgError } = await supabase
+    {/*}  const { data: pkg, error: pkgError } = await supabase
         .from('packages')
         .select('package_id')
         .eq('package_name', bookingPackageName)
@@ -417,6 +417,7 @@ app.post('/razorpaywebhook', async (req, res) => {
         console.error('Package not found:', pkgError);
         return res.status(404).json({ error: 'Package not found' });
       }
+        */}
 
       // 🔹 Step 4: Insert Booking into Bookings Table
       const { data: booking, error: bookingError } = await supabase
@@ -426,7 +427,7 @@ app.post('/razorpaywebhook', async (req, res) => {
             booking_user_id: user.user_id,
             booking_user_name: userName,
             booking_date: new Date().toISOString(),
-            booking_package_id: pkg.package_id,
+            booking_package_id: bookingExpCode,
             booking_package_name: bookingPackageName,
             booking_adv_status: 'Paid',
             booking_package_start_date: bookingPackageDate,
