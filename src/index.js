@@ -328,12 +328,10 @@ app.post('/razorpaywebhook', async (req, res) => {
 
     const bookingMatch = description.match(/^Payment for (.+?) and date: (.+)$/);
 
-    if (bookingMatch) {
-      const bookingPackageName = bookingMatch[1].trim();
+    const bookingPackageName = bookingMatch[1].trim();
       const bookingPackageDate = bookingMatch[2].trim();
       console.log("Package:", bookingPackageName);
       console.log("Date:", bookingPackageDate);  
-    }
 
 
     // ✅ Process only if payment is successful
@@ -343,6 +341,8 @@ app.post('/razorpaywebhook', async (req, res) => {
       console.log(`User Name: ${userName}`);
       console.log(`User Phone: ${userPhone}`);
       console.log(`Package Name: ${packageName}`);
+      console.log("Package:", ${bookingPackageName});
+      console.log("Date:", ${bookingPackageDate});
 
       const nameParts = userName.split(' ');
 
