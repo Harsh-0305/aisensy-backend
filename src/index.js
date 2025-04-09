@@ -167,7 +167,7 @@ if (match && match[1]) {
 
 
       const packageNameId = userPackageId.trim();
-/*
+
       const { data: pkg, error: pkgError } = await supabase
       .from('packages')
       .select('advance,title')
@@ -186,6 +186,10 @@ if (match && match[1]) {
     const packageAmount = pkg.advance
     const packageName = pkg.title
 
+    console.log("Advance: ",packageAmount);
+    console.log("Name: ",packageName);
+
+    /*
 
     const amount = pkg.advance * 100;
 
