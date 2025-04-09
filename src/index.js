@@ -171,8 +171,8 @@ if (match && match[1]) {
       const { data: pkg, error: pkgError } = await supabase
       .from('packages')
       .select('advance,title')
-      .eq('package_id', packageNameId)
-      .single();
+      .eq('package_id', packageNameId);
+     // .single();
 
     if (pkgError) {
       console.error("Supabase query error:",pkgError);
