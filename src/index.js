@@ -168,6 +168,13 @@ if (match && match[1]) {
 
       const packageNameId = userPackageId.trim();
 
+      const { data: pkg2, error: pkgError2 } = await supabase
+      .from('packages')
+      .select('title')
+      .eq('package_id', packageNameId);
+
+      console.log("Title 2: ",pkg2.title);
+
       const { data: pkg, error: pkgError } = await supabase
       .from('packages')
       .select('advance,title')
