@@ -170,7 +170,7 @@ if (match && match[1]) {
       const { data: pkg, error: pkgError } = await supabase
       .from('packages')
       .select('advance,title')
-      .eq('id', packageNameId)
+      .eq('package_id', packageNameId)
       .single();
 
     if (pkgError) {
@@ -355,7 +355,7 @@ app.post('/razorpaywebhook', async (req, res) => {
       const { data: pkg2, error: pkgError2 } = await supabase
       .from('packages')
       .select('advance')
-      .eq('id', bookingExpCode)
+      .eq('package_id', bookingExpCode)
       .single();
 
     if (pkgError2) throw pkgError2;
@@ -409,7 +409,7 @@ app.post('/razorpaywebhook', async (req, res) => {
       // 🔹 Step 3: Get Package ID from Packages Table
     {/*}  const { data: pkg, error: pkgError } = await supabase
         .from('packages')
-        .select('id')
+        .select('package_id')
         .eq('title', bookingPackageName)
         .single();
 
