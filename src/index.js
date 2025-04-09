@@ -75,7 +75,7 @@ const packageNotFoundMessage = `We couldn’t find any trips matching the provid
       return res.status(500).json({error: "Database error"});
     }
     if (!pkgData || pkgData.length === 0) {
-      console.warn("Package not found:", packageName);
+      console.warn("Package not found");
       await sendWhatsAppMessage1(userPhone, packageNotFoundMessage);
       return res.status(404).json({ error: 'Package not found' });
     }
