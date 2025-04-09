@@ -30,7 +30,7 @@ app.get('/get-package-amount', async (req, res) => {
     const { data: pkg, error: pkgError } = await supabase
       .from('packages')
       .select('package_amount')
-      .eq('package_name', packageName)
+      .eq('title', packageName)
       .single();
 
     if (pkgError) throw pkgError;
@@ -58,14 +58,14 @@ app.post('/create-payment-link', async (req, res) => {
     // Get package details from database
     const { data: pkg, error: pkgError } = await supabase
       .from('packages')
-      .select('package_adv_amt')
-      .eq('package_name', packageName)
+      .select('advance')
+      .eq('title', packageName)
       .single();
 
     if (pkgError) throw pkgError;
     if (!pkg) return res.status(404).json({ error: 'Package not found' });
 
-    const amount = pkg.package_adv_amt * 100; // Convert to paise
+    const amount = pkg.advance * 100; // Convert to paise
 
     // Create Razorpay Payment Link
     const response = await axios.post(
@@ -169,8 +169,8 @@ if (match && match[1]) {
 
       const { data: pkg, error: pkgError } = await supabase
       .from('packages')
-      .select('package_adv_amt,package_name')
-      .eq('package_id', packageNameId)
+      .select('advance,title')
+      .eq('id', packageNameId)
       .single();
 
     if (pkgError) {
@@ -182,11 +182,11 @@ if (match && match[1]) {
       return res.status(404).json({ error: 'Package not found' });
     }
 
-    const packageAmount = pkg.package_adv_amt 
-    const packageName = pkg.package_name
+    const packageAmount = pkg.advance
+    const packageName = pkg.title
 
 
-    const amount = pkg.package_adv_amt * 100;
+    const amount = pkg.advance * 100;
 
     const response = await axios.post(
       'https://api.razorpay.com/v1/payment_links',
@@ -354,21 +354,21 @@ app.post('/razorpaywebhook', async (req, res) => {
 
       const { data: pkg2, error: pkgError2 } = await supabase
       .from('packages')
-      .select('package_adv_amt')
-      .eq('package_id', bookingExpCode)
+      .select('advance')
+      .eq('id', bookingExpCode)
       .single();
 
     if (pkgError2) throw pkgError2;
     if (!pkg2) return res.status(404).json({ error: 'Package not found' });
 
-    const amount = pkg2.package_adv_amt * 100; // Convert to paise
+    const amount = pkg2.advance * 100; // Convert to paise
 
     console.log(`Amount:", ${amount}`);
 
       // Send WhatsApp message
 
       const responseMessage2 = ` ✅ Thank you for your payment.\nPayment Id: ${paymentId}\n\nWe’ll confirm your slot shortly and let you know the next steps.\n\nStay tuned 😊`;
-      const responseMessage3 = `A booking payment has been received of ₹${pkg2.package_adv_amt} for ${packageName} from ${userName}`;
+      const responseMessage3 = `A booking payment has been received of ₹${pkg2.advance} for ${packageName} from ${userName}`;
 
       const adminPhone = "918094556379";
       
@@ -409,8 +409,8 @@ app.post('/razorpaywebhook', async (req, res) => {
       // 🔹 Step 3: Get Package ID from Packages Table
     {/*}  const { data: pkg, error: pkgError } = await supabase
         .from('packages')
-        .select('package_id')
-        .eq('package_name', bookingPackageName)
+        .select('id')
+        .eq('title', bookingPackageName)
         .single();
 
       if (pkgError || !pkg) {
