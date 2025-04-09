@@ -84,7 +84,7 @@ if (match && match[1]) {
     console.log("Advance: ",packageAmount);
     console.log("Name: ",packageName);
 
-    /*
+    
 
     const amount = pkg.advance * 100;
 
@@ -129,7 +129,7 @@ if (match && match[1]) {
       res.status(200).json({
         paymentLink: response.data.short_url,
         paymentId: response.data.id
-      }); // Print response in console */
+      }); // Print response in console 
       
   } catch (error) {
       console.error("Error processing webhook:", error);
