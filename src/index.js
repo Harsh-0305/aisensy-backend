@@ -126,7 +126,7 @@ app.post("/webhook", async (req, res) => {
       console.log("Incoming Webhook Data:", req.body);
       console.log("Customer Traits:", req.body.data.customer.traits);
 
-      /*
+      
       
       const data = req.body.data;
       if(!data || !data.customer || !data.message){
@@ -137,7 +137,9 @@ app.post("/webhook", async (req, res) => {
       const userPhone = `+91${req.body.data.customer.phone_number}`
       const userMessage = req.body.data.message.message;
 
+      console.log("Message: ",userMessage);
 
+/*
         const match = userMessage.match(/\(?\s*Experience\s*code[:\s]*([A-Z0-9]+)\s*\)?/i);
 
         const dateMatch = userMessage.match(/Trip\s*Date[:\s]*([0-9]{2}-[A-Za-z]{3}-[0-9]{2})/i);
