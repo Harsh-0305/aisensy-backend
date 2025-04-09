@@ -64,21 +64,23 @@ const packageNotFoundMessage = `We couldn’t find any trips matching the provid
 
       const packageNameId = userPackageId.trim();
 
-      const { data: pkg, error: pkgError } = await supabase
+      const { data: pkgData, error: pkgError } = await supabase
       .from('packages')
       .select('advance,title')
-      .eq('package_id', packageNameId)
-      .single();
+      .eq('package_id', packageNameId);
+      
 
     if (pkgError) {
       console.error("Supabase query error:",pkgError);
       return res.status(500).json({error: "Database error"});
     }
-    if (!pkg) {
+    if (!pkgData || pkgData.length === 0) {
       console.warn("Package not found:", packageName);
       await sendWhatsAppMessage1(userPhone, packageNotFoundMessage);
       return res.status(404).json({ error: 'Package not found' });
     }
+
+    const pkg = pkgData[0];
 
     const packageAmount = pkg.advance
     const packageName = pkg.title
