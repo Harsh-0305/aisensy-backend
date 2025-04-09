@@ -1,8 +1,6 @@
 import express from 'express';
 import axios from 'axios';
 import dotenv from 'dotenv';
-import { handleAISensyWebhook } from './controllers/webhookController.js';
-import { getPackageById } from './services/packageService.js';
 import { createClient } from '@supabase/supabase-js'; // Missing supabase client
 import fetch from 'node-fetch'; // Missing fetch import
 import crypto from 'crypto';
@@ -18,106 +16,6 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY
 );
 
-app.get('/get-package-amount', async (req, res) => {
-  try {
-    const { packageName } = req.query;
-
-    if (!packageName) {
-      return res.status(400).json({ error: 'Missing packageName parameter' });
-    }
-
-    // Query Supabase for package amount
-    const { data: pkg, error: pkgError } = await supabase
-      .from('packages')
-      .select('package_amount')
-      .eq('title', packageName)
-      .single();
-
-    if (pkgError) throw pkgError;
-    if (!pkg) return res.status(404).json({ error: 'Package not found' });
-
-    res.status(200).json({ package_amount: pkg.package_amount });
-  } catch (error) {
-    console.error('Error fetching package amount:', error);
-    res.status(500).json({ error: error.message || 'Failed to fetch package amount' });
-  }
-});
-
-// Create Razorpay Payment Link
-
-app.post('/create-payment-link', async (req, res) => {
-  try {
-
-    
-    const { userName, userPhone, packageName } = req.body;
-
-    if (!userName || !userPhone || !packageName) {
-      return res.status(400).json({ error: 'Missing required fields' });
-    }
-
-    // Get package details from database
-    const { data: pkg, error: pkgError } = await supabase
-      .from('packages')
-      .select('advance')
-      .eq('title', packageName)
-      .single();
-
-    if (pkgError) throw pkgError;
-    if (!pkg) return res.status(404).json({ error: 'Package not found' });
-
-    const amount = pkg.advance * 100; // Convert to paise
-
-    // Create Razorpay Payment Link
-    const response = await axios.post(
-      'https://api.razorpay.com/v1/payment_links',
-      {
-        amount: amount,
-        currency: 'INR',
-        description: `Payment for ${packageName}`,
-        customer: {
-          name: userName,
-          contact: userPhone
-        },
-        notify: { sms: true }
-      },
-      {
-        auth: {
-          username: process.env.RAZORPAY_KEY_ID,
-          password: process.env.RAZORPAY_KEY_SECRET
-        }
-      }
-    );
-
-    res.status(200).json({
-      paymentLink: response.data.short_url,
-      paymentId: response.data.id
-    });
-
-    const paymentLink = response.data.short_url;
-  //  await sendPaymentWhatsAppMessage(amount, userPhone, userName ,paymentLink)
-
-  } catch (error) {
-    console.error('Error creating payment link:', error.response?.data || error.message || error);
-    if (!res.headersSent) { // ✅ Check if response is already sent
-      res.status(500).json({ error: 'Failed to create payment link' });
-    }
-  }
-});
-
-const INTERAKT_SECRET = process.env.INTERAKT_SECRET;
-const verifySignature = (req) => {
-  const signature = req.headers["x-interakt-signature"];
-  const payload = JSON.stringify(req.body);
-  
-  const expectedSignature = crypto
-      .createHmac("sha256", INTERAKT_SECRET)
-      .update(payload)
-      .digest("hex");
-
-  return signature === expectedSignature;
-};
-
-let storedMessages = {};
 
 app.post("/webhook", async (req, res) => {
   try {
@@ -126,7 +24,6 @@ app.post("/webhook", async (req, res) => {
       console.log("Incoming Webhook Data:", req.body);
       console.log("Customer Traits:", req.body.data.customer.traits);
 
-      
       
       const data = req.body.data;
       if(!data || !data.customer || !data.message){
@@ -164,22 +61,13 @@ if (match && match[1]) {
       console.log("Package Id", userPackageId);
       console.log("Trip Date:",packageDate);
 
-
-
       const packageNameId = userPackageId.trim();
-
-      const { data: pkg2, error: pkgError2 } = await supabase
-      .from('packages')
-      .select('title')
-      .eq('package_id', packageNameId);
-
-      console.log("Title 2: ",pkg2.title);
 
       const { data: pkg, error: pkgError } = await supabase
       .from('packages')
       .select('advance,title')
-      .eq('package_id', packageNameId);
-     // .single();
+      .eq('package_id', packageNameId)
+      .single();
 
     if (pkgError) {
       console.error("Supabase query error:",pkgError);
