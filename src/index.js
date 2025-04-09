@@ -34,17 +34,17 @@ app.post("/webhook", async (req, res) => {
       const userPhone = `+91${req.body.data.customer.phone_number}`
       const userMessage = req.body.data.message.message;
 
-      console.log("Message: ",userMessage);
+     // console.log("Message: ",userMessage);
 
 
         const match = userMessage.match(/\(?\s*Experience\s*code[:\s]*([A-Z0-9]+)\s*\)?/i);
 
-        console.log("Match: ",match);
+       // console.log("Match: ",match);
 
 
         const dateMatch = userMessage.match(/Trip\s*Date[:\s]*([0-9]{2}-[A-Za-z]{3}-[0-9]{2})/i);
 
-        console.log("Date: ",dateMatch);
+       // console.log("Date: ",dateMatch);
 
         const packageDate = dateMatch ? dateMatch[1] : null;
 
@@ -53,13 +53,14 @@ let userPackageId = "";
 if (match && match[1]) {
   userPackageId = match[1];
 }
-      
+ 
+const packageNotFoundMessage = `We couldn’t find any trips matching the provided details. Please double-check the information or explore available options at Tripuva.com`;
 
 
-      console.log("Name", userName);
-      console.log("Phone", userPhone);
-      console.log("Package Id", userPackageId);
-      console.log("Trip Date:",packageDate);
+      //console.log("Name", userName);
+      //console.log("Phone", userPhone);
+      //console.log("Package Id", userPackageId);
+      //console.log("Trip Date:",packageDate);
 
       const packageNameId = userPackageId.trim();
 
@@ -75,16 +76,15 @@ if (match && match[1]) {
     }
     if (!pkg) {
       console.warn("Package not found:", packageName);
+      await sendWhatsAppMessage1(userPhone, packageNotFoundMessage);
       return res.status(404).json({ error: 'Package not found' });
     }
 
     const packageAmount = pkg.advance
     const packageName = pkg.title
 
-    console.log("Advance: ",packageAmount);
-    console.log("Name: ",packageName);
-
-    
+    //console.log("Advance: ",packageAmount);
+    //console.log("Name: ",packageName);
 
     const amount = pkg.advance * 100;
 
@@ -113,11 +113,7 @@ if (match && match[1]) {
 
     const messageSent1 = await sendWhatsAppMessage2(userPhone," ", responseMessage1);
 
-   
-
-
-
-    if (!messageSent1) {
+   if (!messageSent1) {
         return res.status(500).json({ error: "Failed to send WhatsApp message to the customer" });
     }
 
@@ -125,7 +121,7 @@ if (match && match[1]) {
       return res.status(500).json({ error: "Failed to send WhatsApp message to the admin" });
   }
 
-      console.log("Incoming Webhook Data:", userMessage);
+    //  console.log("Incoming Webhook Data:", userMessage);
       res.status(200).json({
         paymentLink: response.data.short_url,
         paymentId: response.data.id
@@ -368,54 +364,6 @@ if (updateError) {
     res.status(500).json({ error: 'Failed to process webhook' });
   }
 });
-
-
-/*const sendConfirmationWhatsAppMessage = async (userPhone, firstName, packageName, paymentId, amount) => {
-  try {
-    const response = await axios.post(
-      'https://backend.aisensy.com/campaign/t1/api/v2', // AISensy API URL
-      {
-        apiKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ZTZkNGYyNGY4YmE4MGY3YWU0NThhNyIsIm5hbWUiOiJUcmlwdXZhLXNpdGUiLCJhcHBOYW1lIjoiQWlTZW5zeSIsImNsaWVudElkIjoiNjdkN2RmZTBlNDgwMWIwYmYxN2E5ZjY5IiwiYWN0aXZlUGxhbiI6IkZSRUVfRk9SRVZFUiIsImlhdCI6MTc0MzE4MTA0Mn0.IvYFVDvFxFOrr3rAK8a2G0DfvFZKgloXJs0Ol4GKnpI",
-        campaignName: "booking_confirmation",
-        destination: userPhone,
-        userName: firstName,
-        templateParams: [String(firstName), String(amount), String(packageName), String(paymentId)]
-      }
-    );
-
-    console.log(`📩 WhatsApp message sent successfully`);
-  } catch (error) {
-    console.error('❌ Failed to send WhatsApp message:', error.response?.data || error.message);
-  }
-};
-*/
-/*
-const sendPaymentWhatsAppMessage = async (amount,userPhone,userName,paymentLink) => {
-  try {
-    const response = await axios.post(
-      'https://backend.aisensy.com/campaign/t1/api/v2', // AISensy API URL
-      {
-        apiKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ZTZkNGYyNGY4YmE4MGY3YWU0NThhNyIsIm5hbWUiOiJUcmlwdXZhLXNpdGUiLCJhcHBOYW1lIjoiQWlTZW5zeSIsImNsaWVudElkIjoiNjdkN2RmZTBlNDgwMWIwYmYxN2E5ZjY5IiwiYWN0aXZlUGxhbiI6IkZSRUVfRk9SRVZFUiIsImlhdCI6MTc0MzE4MTA0Mn0.IvYFVDvFxFOrr3rAK8a2G0DfvFZKgloXJs0Ol4GKnpI",
-        campaignName: "booking_payment_link",
-        destination: userPhone,
-        userName: userName,
-        templateParams: [String(amount),String(paymentLink)]
-      }
-    );
-
-    console.log(`📩 Payment Link sent successfully`);
-  } catch (error) {
-    console.error('❌ Failed to send Payment Link:', error.response?.data || error.message);
-  }
-};
-*/
-
-/*const auth = new google.auth.GoogleAuth({
-  keyFile: "credentials.json", // Ensure you have your Google service account JSON file
-  scopes: ["https://www.googleapis.com/auth/spreadsheets"]
-});*/
-
-//const sheets = google.sheets({ version: "v4", auth });
 
 app.get('/health', (req, res) => {
   console.log('Health check received at:', new Date().toISOString());
