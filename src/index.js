@@ -144,9 +144,11 @@ app.post("/webhook", async (req, res) => {
 
         console.log("Match: ",match);
 
-/*
+
         const dateMatch = userMessage.match(/Trip\s*Date[:\s]*([0-9]{2}-[A-Za-z]{3}-[0-9]{2})/i);
 
+        console.log("Date: ",dateMatch);
+/*
         const packageDate = dateMatch ? dateMatch[1] : null;
 
 let userPackageId = "";
