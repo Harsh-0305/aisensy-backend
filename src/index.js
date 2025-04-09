@@ -94,7 +94,7 @@ app.post('/create-payment-link', async (req, res) => {
     });
 
     const paymentLink = response.data.short_url;
-    await sendPaymentWhatsAppMessage(amount, userPhone, userName ,paymentLink)
+  //  await sendPaymentWhatsAppMessage(amount, userPhone, userName ,paymentLink)
 
   } catch (error) {
     console.error('Error creating payment link:', error.response?.data || error.message || error);
@@ -125,6 +125,8 @@ app.post("/webhook", async (req, res) => {
       console.log("Working");
       console.log("Incoming Webhook Data:", req.body);
       console.log("Customer Traits:", req.body.data.customer.traits);
+
+      /*
       
       const data = req.body.data;
       if(!data || !data.customer || !data.message){
@@ -135,14 +137,6 @@ app.post("/webhook", async (req, res) => {
       const userPhone = `+91${req.body.data.customer.phone_number}`
       const userMessage = req.body.data.message.message;
 
-      /*const keyword = "ID: ";
-      const index = userMessage.indexOf(keyword);
-      
-      let userPackageId = "";
-      
-      if (index !== -1) {
-        userPackageId = userMessage.slice(index + keyword.length).trim();
-      }*/
 
         const match = userMessage.match(/\(?\s*Experience\s*code[:\s]*([A-Z0-9]+)\s*\)?/i);
 
@@ -229,7 +223,7 @@ if (match && match[1]) {
       res.status(200).json({
         paymentLink: response.data.short_url,
         paymentId: response.data.id
-      }); // Print response in console
+      }); // Print response in console */
       
   } catch (error) {
       console.error("Error processing webhook:", error);
