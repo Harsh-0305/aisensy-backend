@@ -63,7 +63,7 @@ const { data: pkg3, error: pkgError3 } = await supabase
     return res.status(500).json({ error: "Database error" });
   }
   
-  if (!pkg3) {
+  if (!pkg3 || pkg3.length === 0) {
     const notFoundMsg = "No matching trip found.\n\n Please check the trip details or visit Tripuva.com for more info.";
     await sendWhatsAppMessage1(userPhone, notFoundMsg);
     return res.status(404).json({ error: "Package not found" });
