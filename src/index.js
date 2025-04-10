@@ -20,9 +20,9 @@ const supabase = createClient(
 app.post("/webhook", async (req, res) => {
   try {
 
-      console.log("Working");
-      console.log("Incoming Webhook Data:", req.body);
-      console.log("Customer Traits:", req.body.data.customer.traits);
+    //  console.log("Working");
+    //  console.log("Incoming Webhook Data:", req.body);
+    //  console.log("Customer Traits:", req.body.data.customer.traits);
 
       
       const data = req.body.data;
@@ -34,26 +34,42 @@ app.post("/webhook", async (req, res) => {
       const userPhone = `+91${req.body.data.customer.phone_number}`
       const userMessage = req.body.data.message.message;
 
-     // console.log("Message: ",userMessage);
-
-
-        const match = userMessage.match(/\(?\s*Experience\s*code[:\s]*([A-Z0-9]+)\s*\)?/i);
-
-       // console.log("Match: ",match);
-
-
+        const packageNameMatch = userMessage.match(/Trip:\s*(.+)/i);
+        const expCodeMatch = userMessage.match(/\(?\s*Experience\s*code[:\s]*([A-Z0-9]+)\s*\)?/i);
         const dateMatch = userMessage.match(/Trip\s*Date[:\s]*([0-9]{2}-[A-Za-z]{3}-[0-9]{2})/i);
-
-       // console.log("Date: ",dateMatch);
-
+        
+        const packagen = packageNameMatch ? packageNameMatch[1].trim() : null;
         const packageDate = dateMatch ? dateMatch[1] : null;
 
 let userPackageId = "";
 
-if (match && match[1]) {
-  userPackageId = match[1];
+if (expCodeMatch && expCodeMatch[1]) {
+  userPackageId = expCodeMatch[1];
 }
- 
+
+{/*  Trip Details Check  - Begin*/}
+
+const { data: pkg3, error: pkgError3 } = await supabase
+  .from('packages')
+  .select('advance, title')
+  .eq('title', packagen)
+  .eq('package_id', userPackageId)
+  .contains('start_date', [packageDate]); 
+
+  if (pkgError3) {
+    console.error("Supabase query error:", pkgError3);
+    return res.status(500).json({ error: "Database error" });
+  }
+  
+  if (!pkg3) {
+    const notFoundMsg = "No matching trip found.\n\n Please check the trip details or visit Tripuva.com for more info.";
+    await sendWhatsAppMessage1(userPhone, notFoundMsg);
+    return res.status(404).json({ error: "Package not found" });
+  }
+
+  {/*  Trip Details Check  - End*/}
+
+
 const packageNotFoundMessage = `We couldn’t find any trips matching the provided details. Please double-check the information or explore available options at Tripuva.com`;
 
 
