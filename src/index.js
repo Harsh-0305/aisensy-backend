@@ -268,6 +268,52 @@ app.post('/razorpaywebhook2', async (req, res) => {
       const userFirstName = nameParts[0];
       const userLastName = nameParts.slice(1).join(' ') || ''; // Handles cases where there's no last name
 
+{/* BEGIN  */}
+
+
+// 🔹 Step 3: Decrement the available slot for the selected date
+const { data: packageData, error: fetchPackageError } = await supabase
+  .from('packages')
+  .select('start_date_2')
+  .eq('package_id', bookingExpCode)
+  .single();
+
+if (fetchPackageError || !packageData?.start_date_2) {
+  console.error('❌ Error fetching start_date_2:', fetchPackageError);
+} else {
+  const startDateSlots = packageData.start_date_2;
+
+  // Check if the selected date exists
+  if (startDateSlots[bookingPackageDate] !== undefined && startDateSlots[bookingPackageDate] > 0) {
+    startDateSlots[bookingPackageDate] -= 1;
+
+    const { error: updateError } = await supabase
+      .from('packages')
+      .update({ start_date_2: startDateSlots })
+      .eq('package_id', bookingExpCode);
+
+    if (updateError) {
+      console.error('❌ Error updating available slots:', updateError);
+    } else {
+      console.log(`🛎️ Slot updated for ${bookingPackageDate}. Remaining slots: ${startDateSlots[bookingPackageDate]}`);
+    }
+  } else {
+    console.warn(`⚠️ No available slot to decrement for ${bookingPackageDate} or date not found`);
+  }
+}
+
+
+
+{/*  END    */}
+
+
+
+
+
+
+
+
+
       const { data: pkg2, error: pkgError2 } = await supabase
       .from('packages')
       .select('advance')
