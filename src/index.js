@@ -64,7 +64,7 @@ const { data: pkg3, error: pkgError3 } = await supabase
   }
   
   if (!pkg3 || pkg3.length === 0) {
-    const notFoundMsg = "No matching trip found.\n\n Please check the trip details or visit Tripuva.com for more info.";
+    const notFoundMsg = "No matching trip found 😔\n\nPlease check the trip details\n\nYou can explore more trips at Tripuva.com 🚀";
     await sendWhatsAppMessage1(userPhone, notFoundMsg);
     return res.status(404).json({ error: "Package not found" });
   }
@@ -81,7 +81,7 @@ const packageNotFoundMessage = `We couldn’t find any trips matching the provid
       //console.log("Trip Date:",packageDate);
 
       
-
+{/*}
       const { data: pkgData, error: pkgError } = await supabase
       .from('packages')
       .select('advance,title')
@@ -96,9 +96,9 @@ const packageNotFoundMessage = `We couldn’t find any trips matching the provid
       console.warn("Package not found");
       await sendWhatsAppMessage1(userPhone, packageNotFoundMessage);
       return res.status(404).json({ error: 'Package not found' });
-    }
+    } */}
 
-    const pkg = pkgData[0];
+    const pkg = pkg3[0];
 
     const packageAmount = pkg.advance
     const packageName = pkg.title
