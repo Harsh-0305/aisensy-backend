@@ -47,6 +47,8 @@ if (expCodeMatch && expCodeMatch[1]) {
   userPackageId = expCodeMatch[1];
 }
 
+const packageNameId = userPackageId.trim();
+
 {/*  Trip Details Check  - Begin*/}
 
 const { data: pkg3, error: pkgError3 } = await supabase
@@ -78,7 +80,7 @@ const packageNotFoundMessage = `We couldn’t find any trips matching the provid
       //console.log("Package Id", userPackageId);
       //console.log("Trip Date:",packageDate);
 
-      const packageNameId = userPackageId.trim();
+      
 
       const { data: pkgData, error: pkgError } = await supabase
       .from('packages')
