@@ -55,11 +55,15 @@ const packageNameId = userPackageId.trim();
 {/*  Trip Details Check  - Begin*/}
 
 const { data: pkg3, error: pkgError3 } = await supabase
-  .from('packages')
-  .select('advance, title')
-  .eq('title', packagen)
-  .eq('package_id', userPackageId)
-  .contains('start_date', [packageDate]); 
+  .rpc('check_date_in_start_date_2', {
+    pkg_id: userPackageId,
+    date_to_check: packageDate,
+  });
+
+if (pkgError3) {
+  console.error('Error checking date in start_date_2:', pkgError3);
+  return res.status(500).json({ error: 'Something went wrong checking the date' });
+}
 
   if (pkgError3) {
     console.error("Supabase query error:", pkgError3);
