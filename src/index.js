@@ -76,6 +76,10 @@ if (pkgError3) {
     return res.status(404).json({ error: "Package not found" });
   }
 
+  if(pkg3){console.log("Valid Trip");
+
+  }
+
   {/*  Trip Details Check  - End*/}
 
 
@@ -88,10 +92,11 @@ if (pkgError3) {
       console.log("Trip Date:",packageDate);
 
       
-{/*}
+
       const { data: pkgData, error: pkgError } = await supabase
       .from('packages')
       .select('advance,title')
+      .eq('title', packagen)
       .eq('package_id', packageNameId);
       
 
@@ -103,9 +108,9 @@ if (pkgError3) {
       console.warn("Package not found");
       await sendWhatsAppMessage1(userPhone, packageNotFoundMessage);
       return res.status(404).json({ error: 'Package not found' });
-    } */}
+    }
 
-    const pkg = pkg3[0];
+    const pkg = pkgData[0];
 
     const packageAmount = pkg.advance
     const packageName = pkg.title
