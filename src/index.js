@@ -37,9 +37,12 @@ app.post("/webhook", async (req, res) => {
         const packageNameMatch = userMessage.match(/Trip:\s*(.+)/i);
         const expCodeMatch = userMessage.match(/\(?\s*Experience\s*code[:\s]*([A-Z0-9]+)\s*\)?/i);
         const dateMatch = userMessage.match(/Trip\s*Date[:\s]*([0-9]{2}-[A-Za-z]{3}-[0-9]{2})/i);
+
+        console.log(dateMatch);
         
         const packagen = packageNameMatch ? packageNameMatch[1].trim() : null;
         const packageDate = dateMatch ? dateMatch[1] : null;
+        
 
 let userPackageId = "";
 
@@ -75,10 +78,10 @@ const { data: pkg3, error: pkgError3 } = await supabase
 // const packageNotFoundMessage = `We couldn’t find any trips matching the provided details. Please double-check the information or explore available options at Tripuva.com`;
 
 
-      //console.log("Name", userName);
+      console.log("Name", userName);
       //console.log("Phone", userPhone);
       //console.log("Package Id", userPackageId);
-      //console.log("Trip Date:",packageDate);
+      console.log("Trip Date:",packageDate);
 
       
 {/*}
