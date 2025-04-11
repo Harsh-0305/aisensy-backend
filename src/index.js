@@ -484,7 +484,9 @@ async function processRazorpayWebhook(body, signature) {
     console.log("Package:", bookingPackageName);
     console.log("Date:", bookingPackageDate);
 
-    if (event === 'payment_link.paid' && paymentEntity.status === 'paid') {
+    
+
+    if (event === 'payment_link.paid' && status === 'paid') {
       // 🧠 Move all your booking logic here like before
       // Send WhatsApp, update slots, insert bookings etc.
       console.log(`✅ Payment received!`);
