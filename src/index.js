@@ -524,6 +524,8 @@ async function processRazorpayWebhook(body, signature) {
 
         console.log(startDateSlots);
         console.log(startDateSlots[bookingPackageDate]);
+        console.log(bookingMatch);
+        console.log(description);
 
       if (startDateSlots[bookingPackageDate] !== undefined && startDateSlots[bookingPackageDate] > 0) {
         startDateSlots[bookingPackageDate] -= 1;
