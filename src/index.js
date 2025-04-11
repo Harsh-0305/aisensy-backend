@@ -453,6 +453,14 @@ app.post('/razorpaywebhook3', async (req, res) => {
   processRazorpayWebhook(req.body, req.headers['x-razorpay-signature']);
 });
 
+
+
+
+
+
+
+
+
 async function processRazorpayWebhook(body, signature) {
   try {
     const secret = process.env.RAZORPAY_WEBHOOK_SECRET;
@@ -503,10 +511,42 @@ async function processRazorpayWebhook(body, signature) {
       const userFirstName = nameParts[0];
       const userLastName = nameParts.slice(1).join(' ') || '';
 
+      const { data: packageData, error: fetchPackageError } = await supabase
+     .from('packages')
+     .select('start_date_2')
+     .eq('package_id', bookingExpCode)
+     .single();
+        
+     if (fetchPackageError || !packageData?.start_date_2) {
+      console.error('❌ Error fetching start_date_2:', fetchPackageError);
+    }else {
+      const startDateSlots = packageData.start_date_2;
+
+      if (startDateSlots[bookingPackageDate] !== undefined && startDateSlots[bookingPackageDate] > 0) {
+        startDateSlots[bookingPackageDate] -= 1;
+
+      const { error: updateError } = await supabase
+      .from('packages')
+      .update({ start_date_2: startDateSlots })
+      .eq('package_id', bookingExpCode);
+
+
+      if (updateError) {
+        console.error('❌ Error updating available slots:', updateError);
+      } else {
+        console.log(`🛎️ Slot updated for ${bookingPackageDate}. Remaining slots: ${startDateSlots[bookingPackageDate]}`);
+      }
+    } else {
+      console.warn(`⚠️ No available slot to decrement for ${bookingPackageDate} or date not found`);
+    }
+  }
+
+
     }
   } catch (err) {
     console.error("❌ Webhook processing failed:", err);
   }
+
 }
 
 
