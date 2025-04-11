@@ -522,9 +522,13 @@ async function processRazorpayWebhook(body, signature) {
     }else {
       const startDateSlots = packageData.start_date_2;
 
+        console.log(startDateSlots);
+        console.log(startDateSlots[bookingPackageDate]);
+
       if (startDateSlots[bookingPackageDate] !== undefined && startDateSlots[bookingPackageDate] > 0) {
         startDateSlots[bookingPackageDate] -= 1;
 
+      
       const { error: updateError } = await supabase
       .from('packages')
       .update({ start_date_2: startDateSlots })
