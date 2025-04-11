@@ -72,7 +72,7 @@ const { data: pkg3, error: pkgError3 } = await supabase
   {/*  Trip Details Check  - End*/}
 
 
-const packageNotFoundMessage = `We couldn’t find any trips matching the provided details. Please double-check the information or explore available options at Tripuva.com`;
+// const packageNotFoundMessage = `We couldn’t find any trips matching the provided details. Please double-check the information or explore available options at Tripuva.com`;
 
 
       //console.log("Name", userName);
@@ -137,9 +137,9 @@ const packageNotFoundMessage = `We couldn’t find any trips matching the provid
         return res.status(500).json({ error: "Failed to send WhatsApp message to the customer" });
     }
 
-    if (!messageSent2) {
+  {/*}  if (!messageSent2) {
       return res.status(500).json({ error: "Failed to send WhatsApp message to the admin" });
-  }
+  } */}
 
     //  console.log("Incoming Webhook Data:", userMessage);
       res.status(200).json({
@@ -219,7 +219,12 @@ const sendWhatsAppMessage2 = async (phone, imageUrl,  message) => {
 
 
 app.post('/razorpaywebhook2', async (req, res) => {
+
+  res.status(200).json({ status: 'received' });
+
   try {
+
+    
     const secret = process.env.RAZORPAY_WEBHOOK_SECRET;
     const signature = req.headers['x-razorpay-signature'];
 
@@ -244,11 +249,11 @@ app.post('/razorpaywebhook2', async (req, res) => {
 
     const bookingMatch = description.match(/^Payment for (.+?) and date: (.+?) and Exp code: (.+)$/i);
 
-      const bookingPackageName = bookingMatch[1].trim();
-      const bookingPackageDate = bookingMatch[2].trim();
-      const bookingExpCode = bookingMatch[3].trim();
-      console.log("Package:", bookingPackageName);
-      console.log("Date:", bookingPackageDate);
+    const bookingPackageName = bookingMatch[1].trim();
+    const bookingPackageDate = bookingMatch[2].trim();
+    const bookingExpCode = bookingMatch[3].trim();
+    console.log("Package:", bookingPackageName);
+    console.log("Date:", bookingPackageDate);
       
 
 
@@ -440,4 +445,67 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
+
+app.post('/razorpaywebhook3', async (req, res) => {
+  res.status(200).json({ status: 'received' }); // 🔹 Early ACK to Razorpay
+
+  processRazorpayWebhook(req.body, req.headers['x-razorpay-signature']);
+});
+
+async function processRazorpayWebhook(body, signature) {
+  try {
+    const secret = process.env.RAZORPAY_WEBHOOK_SECRET;
+
+    // 🔐 Signature Verification (raw body preferred!)
+    const hmac = crypto.createHmac('sha256', secret);
+    hmac.update(JSON.stringify(body)); // ⚠️ Should be `req.body` as raw
+    const digest = hmac.digest('hex');
+
+    if (digest !== signature) {
+      console.error("❌ Invalid webhook signature");
+      return;
+    }
+
+    const event = body.event;
+    const paymentId = body.payload.payment_link.entity.id;
+    const status = body.payload.payment_link.entity.status;
+    const userName = body.payload.payment_link.entity.customer.name;
+    const userPhone = body.payload.payment_link.entity.customer.contact;
+    const packageName = body.payload.payment_link.entity.description.replace("Payment for ", "");
+    
+    const description = body.payload.payment_link.entity.description;
+
+    const bookingMatch = description.match(/^Payment for (.+?) and date: (.+?) and Exp code: (.+)$/i);
+
+    const bookingPackageName = bookingMatch[1].trim();
+    const bookingPackageDate = bookingMatch[2].trim();
+    const bookingExpCode = bookingMatch[3].trim();
+    console.log("Package:", bookingPackageName);
+    console.log("Date:", bookingPackageDate);
+
+    if (event === 'payment_link.paid' && paymentEntity.status === 'paid') {
+      // 🧠 Move all your booking logic here like before
+      // Send WhatsApp, update slots, insert bookings etc.
+      console.log(`✅ Payment received!`);
+      console.log(`Payment ID: ${paymentId}`);
+      console.log(`User Name: ${userName}`);
+      console.log(`User Phone: ${userPhone}`);
+      console.log(`Package Name: ${packageName}`);
+      console.log(`Package:", ${bookingPackageName}`);
+      console.log(`Date:", ${bookingPackageDate}`);
+      console.log(`Exp Code:", ${bookingExpCode}`);
+
+      const nameParts = userName.split(' ');
+
+      const userFirstName = nameParts[0];
+      const userLastName = nameParts.slice(1).join(' ') || '';
+
+    }
+  } catch (err) {
+    console.error("❌ Webhook processing failed:", err);
+  }
+}
+
+
 
