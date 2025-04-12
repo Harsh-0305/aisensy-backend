@@ -215,6 +215,8 @@ if(pkg1){console.log("Valid Trip");
       console.log("Checking user bookings.....");
       console.log(userPhone);
 
+      console.log('userPhone:', userPhone, typeof userPhone);
+
       const { data: user, error: userError } = await supabase
       .from('users')
       .select('booking_user_id, booked_package')
