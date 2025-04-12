@@ -222,7 +222,7 @@ if(pkg1){console.log("Valid Trip");
       .single();
 
 
-      const userr= user[0];
+      const userr= user;
       console.log(userr.booked_package);
 
       if (userError || !user) {
