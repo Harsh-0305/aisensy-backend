@@ -219,6 +219,8 @@ if(pkg1){console.log("Valid Trip");
       .eq('phone_number', '+918094556379');
 
       console.log('Matching users:', user);
+      console.log(user.booked_packages);
+      console.log(user.booked_packages.length);
 
 
       if (userError || !user) {
