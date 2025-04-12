@@ -221,7 +221,9 @@ if(pkg1){console.log("Valid Trip");
       .eq('phone_number', userPhone)
       .single();
 
-      console.log(user.phone_number);
+
+      const userr= user[0];
+      console.log(userr.booked_package);
 
       if (userError || !user) {
         await sendWhatsAppMessage1(userPhone, `😕 Couldn't find your account. Please try booking again or reply with "Hi" to restart.`);
