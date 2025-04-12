@@ -52,7 +52,7 @@ app.post("/webhook", async (req, res) => {
         
         
 
-const packageNameId = userPackageId.trim();
+
 
 {/*  Trip Details Check  - Begin*/}
 
@@ -69,6 +69,8 @@ if (packageNameMatch && expCodeMatch && dateMatch)
     if (expCodeMatch && expCodeMatch[1]) {
         userPackageId = expCodeMatch[1];
     }
+
+    const packageNameId = userPackageId.trim();
 
 const { data: pkg3, error: pkgError3 } = await supabase
   .rpc('check_date_in_start_date_2', {
@@ -91,7 +93,7 @@ if(pkg3){console.log("Valid Trip");
 
   }
 
-}
+
 
   {/*  Trip Details Check  - End*/}
 
@@ -171,6 +173,7 @@ if(pkg3){console.log("Valid Trip");
         paymentLink: response.data.short_url,
         paymentId: response.data.id
       }); // Print response in console 
+    }
       
   } catch (error) {
       console.error("Error processing webhook:", error);
