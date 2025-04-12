@@ -34,14 +34,18 @@ app.post("/webhook", async (req, res) => {
       const userPhone = `+91${req.body.data.customer.phone_number}`
       const userMessage = req.body.data.message.message;
 
-      let userMessage2 = req.body.data.message?.text?.body?.trim().toLowerCase() || '';
+      
       let buttonTitle = '';
 
-      try {
-        const parsedMessage = JSON.parse(req.body.data.message?.message || '{}');
-        buttonTitle = parsedMessage?.button_reply?.title?.trim().toLowerCase();
-      } catch (error) {
-        console.error('Failed to parse button message:', error);
+      const rawMessage = req.body.data.message?.message || '';
+
+      if (rawMessage.startsWith('{') && rawMessage.endsWith('}')) {
+        try {
+          const parsedMessage = JSON.parse(rawMessage);
+          buttonTitle = parsedMessage?.button_reply?.title?.trim().toLowerCase();
+        } catch (error) {
+          console.error('Failed to parse button message:', error);
+        }
       }
 
       // console.log('FULL WEBHOOK:', JSON.stringify(req.body, null, 2));
