@@ -41,8 +41,11 @@ app.post("/webhook", async (req, res) => {
         const trimmedMessage = userMessage.trim().toLowerCase();
         const greetings = ['hi', 'hello', 'hey'];
         const isGreetingOnly = greetings.includes(trimmedMessage);
+        const manageBooking = 'manage booking';
+        const isManageBooking = manageBooking.includes(trimmedMessage);
 
-        if (!packageNameMatch && !expCodeMatch && !dateMatch && !isGreetingOnly) {
+
+        if (!packageNameMatch && !expCodeMatch && !dateMatch && !isGreetingOnly && !isManageBooking) {
           await sendWhatsAppMessage1(userPhone, 
             `Hey there! 😊 I couldn't understand your message.\n\nYou can explore all our amazing trips at 🌐 Tripuva.com\n\nOr just reply with "Hi" to get started! 🚀`);
           
