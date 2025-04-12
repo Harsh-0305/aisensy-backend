@@ -58,6 +58,8 @@ app.post("/webhook", async (req, res) => {
 
       if(buttonTitle !== 'manage bookings'){
 
+        console.log(buttonTitle);
+
       console.log("Final interpreted message:", userMessage);
 
       console.log(userMessage);
