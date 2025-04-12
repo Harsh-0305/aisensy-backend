@@ -34,12 +34,25 @@ app.post("/webhook", async (req, res) => {
       const userPhone = `+91${req.body.data.customer.phone_number}`
       const userMessage = req.body.data.message.message;
 
-      const userMessage2 = req.body.message?.text?.body?.trim().toLowerCase() || '';
-      const buttonTitle = req.body.button_reply?.title?.trim().toLowerCase();
+      let userMessage2 = req.body.data.message?.text?.body?.trim().toLowerCase() || '';
+      let buttonTitle = '';
 
-      console.log('FULL WEBHOOK:', JSON.stringify(req.body, null, 2));
+      try {
+        const parsedMessage = JSON.parse(req.body.data.message?.message || '{}');
+        buttonTitle = parsedMessage?.button_reply?.title?.trim().toLowerCase();
+      } catch (error) {
+        console.error('Failed to parse button message:', error);
+      }
+
+      // console.log('FULL WEBHOOK:', JSON.stringify(req.body, null, 2));
 
       console.log("Title of button: ",buttonTitle);
+
+      if (!userMessage && buttonTitle) {
+        userMessage = buttonTitle;
+      }
+
+      console.log("Final interpreted message:", userMessage);
 
       console.log(userMessage);
 
@@ -183,7 +196,7 @@ if(pkg1){console.log("Valid Trip");
 
     {/* ********************* Manage Booking ***************************** */}
 
-    if (userMessage.trim().toLowerCase() === 'manage bookings') {
+    if (userMessage === 'manage bookings') {
       // handle booking lookup
 
       const { data: user, error: userError } = await supabase
