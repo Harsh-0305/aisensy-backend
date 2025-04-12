@@ -35,7 +35,9 @@ app.post("/webhook", async (req, res) => {
       const userMessage = req.body.data.message.message;
 
       const userMessage2 = req.body.message?.text?.body?.trim().toLowerCase() || '';
-      const buttonTitle = req.body.payload?.button_reply?.title?.trim().toLowerCase();
+      const buttonTitle = req.body.button_reply?.title?.trim().toLowerCase();
+
+      console.log('FULL WEBHOOK:', JSON.stringify(req.body, null, 2));
 
       console.log("Title of button: ",buttonTitle);
 
