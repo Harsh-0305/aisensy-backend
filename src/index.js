@@ -219,7 +219,7 @@ if(pkg1){console.log("Valid Trip");
 
       const { data: user, error: userError } = await supabase
       .from('users')
-      .select('booking_user_id')
+      .select('user_id')
       .eq('phone_number', '+918094556379');
 
       console.log('Matching users:', user);
