@@ -228,251 +228,11 @@ const sendWhatsAppMessage2 = async (phone, imageUrl,  message) => {
 };
 
 
-
-
-app.post('/razorpaywebhook2', async (req, res) => {
-
-  res.status(200).json({ status: 'received' });
-
-  try {
-
-    
-    const secret = process.env.RAZORPAY_WEBHOOK_SECRET;
-    const signature = req.headers['x-razorpay-signature'];
-
-    // Validate webhook signature
-    const hmac = crypto.createHmac('sha256', secret);
-    hmac.update(JSON.stringify(req.body));
-    const digest = hmac.digest('hex');
-
-    if (digest !== signature) {
-      return res.status(400).json({ error: 'Invalid webhook signature' });
-    }
-
-    // Extract required details
-    const event = req.body.event;
-    const paymentId = req.body.payload.payment_link.entity.id;
-    const status = req.body.payload.payment_link.entity.status;
-    const userName = req.body.payload.payment_link.entity.customer.name;
-    const userPhone = req.body.payload.payment_link.entity.customer.contact;
-    const packageName = req.body.payload.payment_link.entity.description.replace("Payment for ", "");
-    
-    const description = req.body.payload.payment_link.entity.description;
-
-    const bookingMatch = description.match(/^Payment for (.+?) and date: (.+?) and Exp code: (.+)$/i);
-
-    const bookingPackageName = bookingMatch[1].trim();
-    const bookingPackageDate = bookingMatch[2].trim();
-    const bookingExpCode = bookingMatch[3].trim();
-    console.log("Package:", bookingPackageName);
-    console.log("Date:", bookingPackageDate);
-      
-
-
-    // ✅ Process only if payment is successful
-    if (event === 'payment_link.paid' && status === 'paid') {
-      console.log(`✅ Payment received!`);
-      console.log(`Payment ID: ${paymentId}`);
-      console.log(`User Name: ${userName}`);
-      console.log(`User Phone: ${userPhone}`);
-      console.log(`Package Name: ${packageName}`);
-      console.log(`Package:", ${bookingPackageName}`);
-      console.log(`Date:", ${bookingPackageDate}`);
-      console.log(`Exp Code:", ${bookingExpCode}`);
-
-      const nameParts = userName.split(' ');
-
-      const userFirstName = nameParts[0];
-      const userLastName = nameParts.slice(1).join(' ') || ''; // Handles cases where there's no last name
-
-{/* BEGIN  */}
-
-
-// 🔹 Step 1: Decrement the available slot for the selected date
-const { data: packageData, error: fetchPackageError } = await supabase
-  .from('packages')
-  .select('start_date_2')
-  .eq('package_id', bookingExpCode)
-  .single();
-
-if (fetchPackageError || !packageData?.start_date_2) {
-  console.error('❌ Error fetching start_date_2:', fetchPackageError);
-} else {
-  const startDateSlots = packageData.start_date_2;
-
-  // Check if the selected date exists
-  if (startDateSlots[bookingPackageDate] !== undefined && startDateSlots[bookingPackageDate] > 0) {
-    startDateSlots[bookingPackageDate] -= 1;
-
-    const { error: updateError } = await supabase
-      .from('packages')
-      .update({ start_date_2: startDateSlots })
-      .eq('package_id', bookingExpCode);
-
-    if (updateError) {
-      console.error('❌ Error updating available slots:', updateError);
-    } else {
-      console.log(`🛎️ Slot updated for ${bookingPackageDate}. Remaining slots: ${startDateSlots[bookingPackageDate]}`);
-    }
-  } else {
-    console.warn(`⚠️ No available slot to decrement for ${bookingPackageDate} or date not found`);
-  }
-}
-
-
-
-
-
-{/*  END    */}
-
-
-
-
-
-
-
-
-
-      const { data: pkg2, error: pkgError2 } = await supabase
-      .from('packages')
-      .select('advance')
-      .eq('package_id', bookingExpCode)
-      .single();
-
-    if (pkgError2) throw pkgError2;
-    if (!pkg2) return res.status(404).json({ error: 'Package not found' });
-
-    const amount = pkg2.advance * 100; // Convert to paise
-
-    console.log(`Amount:", ${amount}`);
-
-      // Send WhatsApp message
-
-      const responseMessage2 = ` ✅ Thank you for your payment.\nPayment Id: ${paymentId}\n\nWe’ll confirm your slot shortly and let you know the next steps.\n\nStay tuned 😊`;
-      const responseMessage3 = `A booking payment has been received of ₹${pkg2.advance} for ${packageName} from ${userName}`;
-
-      const adminPhone = "918094556379";
-      
-
-      await sendWhatsAppMessage1(userPhone, responseMessage2);
-      await sendWhatsAppMessage1(adminPhone, responseMessage3);
-      
-
-      //await sendConfirmationWhatsAppMessage(userPhone, userFirstName, packageName, paymentId, amount);
-
-
-      // 🔹 Step 1: Check if User Exists in Users Table
-      let { data: user, error: userError } = await supabase
-        .from('users')
-        .select('user_id')
-        .eq('first_name', userFirstName)
-        .single();
-
-      // 🔹 Step 2: If User Does Not Exist, Create New User
-      if (userError || !user) {
-        console.log(`👤 User ${userName} not found. Creating a new user...`);
-
-        const { data: newUser, error: newUserError } = await supabase
-          .from('users')
-          .insert([{ first_name: userFirstName, last_name: userLastName, phone_number: userPhone }])
-          .select('user_id')
-          .single();
-
-        if (newUserError) {
-          console.error('Error creating new user:', newUserError);
-          return res.status(500).json({ error: 'Failed to create user' });
-        }
-
-        user = newUser; // Assign new user data
-        console.log(`✅ New user created: ${userName} (ID: ${user.user_id})`);
-      }
-
-      // 🔹 Step 3: Get Package ID from Packages Table
-    {/*}  const { data: pkg, error: pkgError } = await supabase
-        .from('packages')
-        .select('package_id')
-        .eq('title', bookingPackageName)
-        .single();
-
-      if (pkgError || !pkg) {
-        console.error('Package not found:', pkgError);
-        return res.status(404).json({ error: 'Package not found' });
-      }
-        */}
-
-      // 🔹 Step 4: Insert Booking into Bookings Table
-      const { data: booking, error: bookingError } = await supabase
-        .from('bookings')
-        .insert([
-          {
-            booking_user_id: user.user_id,
-            booking_user_name: userName,
-            booking_date: new Date().toISOString(),
-            booking_package_id: bookingExpCode,
-            booking_package_name: bookingPackageName,
-            booking_adv_status: 'Paid',
-            booking_package_start_date: bookingPackageDate,
-            booking_rm_status: 'Pending', // Assuming remaining payment is still pending
-          }
-        ]);
-
-      if (bookingError) {
-        console.error('Error inserting booking:', bookingError);
-        return res.status(500).json({ error: 'Failed to insert booking' });
-      }
-
-     // 🔹 Step 5: Update User's booked_package in users table
-     const { error: updateError } = await supabase
-  .from('users')
-  .update({
-    booked_package: supabase.rpc('array_append', {
-      column: 'booked_package',  // Column name (PostgreSQL array)
-      value: packageName          // New value to append
-    })
-  })
-  .eq('user_id', user.user_id);
-
-if (updateError) {
-  console.error('Failed to append package:', updateError);
-}
-
-
-      console.log(`✅ Booking inserted successfully for ${userName}`);
-
-      return res.status(200).json({ success: true, message: 'Booking created' });
-    }
-
-    res.status(400).json({ error: 'Invalid payment event' });
-
-  } catch (error) {
-    console.error('Webhook Error:', error);
-    res.status(500).json({ error: 'Failed to process webhook' });
-  }
-});
-
-app.get('/health', (req, res) => {
-  console.log('Health check received at:', new Date().toISOString());
-  res.status(200).send('OK');
-});
-
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
-
-
 app.post('/razorpaywebhook3', async (req, res) => {
   res.status(200).json({ status: 'received' }); // 🔹 Early ACK to Razorpay
 
   processRazorpayWebhook(req.body, req.headers['x-razorpay-signature']);
 });
-
-
-
-
-
-
-
 
 
 async function processRazorpayWebhook(body, signature) {
@@ -509,8 +269,7 @@ async function processRazorpayWebhook(body, signature) {
     
 
     if (event === 'payment_link.paid' && status === 'paid') {
-      // 🧠 Move all your booking logic here like before
-      // Send WhatsApp, update slots, insert bookings etc.
+      
       console.log(`✅ Payment received!`);
       console.log(`Payment ID: ${paymentId}`);
       console.log(`User Name: ${userName}`);
@@ -596,7 +355,6 @@ async function processRazorpayWebhook(body, signature) {
 
       if (newUserError) {
         console.error('Error creating new user:', newUserError);
-        return res.status(500).json({ error: 'Failed to create user' });
       }
 
       user = newUser; // Assign new user data
@@ -607,14 +365,59 @@ async function processRazorpayWebhook(body, signature) {
       console.log("User already exists");
     }
 
+    // Step 4: Insert Booking into Bookings Table
+
+    const { data: booking, error: bookingError } = await supabase
+    .from('bookings')
+    .insert([
+      {
+        booking_user_id: user.user_id,
+        booking_user_name: userName,
+        booking_date: new Date().toISOString(),
+        booking_package_id: bookingExpCode,
+        booking_package_name: bookingPackageName,
+        booking_adv_status: 'Paid',
+        booking_package_start_date: bookingPackageDate,
+        booking_rm_status: 'Pending', // Assuming remaining payment is still pending
+      }
+    ]);
+
+    if (bookingError) {
+      console.error('Error inserting booking:', bookingError);
+    }
+
+     //  Step 5: Update User's booked_package in users table
+
+        // Step 1: Fetch the current array
+
+        const { data: userData, error: fetchError } = await supabase
+        .from('users')
+        .select('booked_package')
+        .eq('booking_user_id', user.user_id)
+        .single();
+
+        if (fetchError) {
+          console.error('❌ Failed to fetch current booked_package:', fetchError);
+        }
+        else {
+
+        // Step 2: Append the new package
+        const updatedPackages = [...(userData.booked_package || []), bookingPackageName];
+
+        // Step 3: Update the array
+        const { error: updateError } = await supabase
+        .from('users')
+       .update({ booked_package: updatedPackages })
+       .eq('user_id', user.user_id);
+
+       if (updateError) {
+        console.error('❌ Failed to update booked_package:', updateError);
+      } else {
+        console.log(`✅ Package "${packageName}" appended to user's booked_package`);
+      }
 
 
-
-
-
-    
-
-
+    }
 
     }
   } catch (err) {
@@ -622,6 +425,17 @@ async function processRazorpayWebhook(body, signature) {
   }
 
 }
+
+
+app.get('/health', (req, res) => {
+  console.log('Health check received at:', new Date().toISOString());
+  res.status(200).send('OK');
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
 
 
 
