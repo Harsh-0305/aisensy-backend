@@ -70,6 +70,10 @@ app.post("/webhook", async (req, res) => {
         const manageBooking = 'Manage Bookings';
         const isManageBooking = manageBooking.toLowerCase().includes(trimmedMessage);
 
+        console.log('userMessage:', userMessage);
+console.log('trimmedMessage:', trimmedMessage);
+console.log('isManageBooking:', isManageBooking);
+
 
         if (!packageNameMatch && !expCodeMatch && !dateMatch && !isGreetingOnly && !isManageBooking) {
           await sendWhatsAppMessage1(userPhone, 
