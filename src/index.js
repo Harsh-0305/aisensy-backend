@@ -44,7 +44,8 @@ app.post("/webhook", async (req, res) => {
 
         if (!packageNameMatch && !expCodeMatch && !dateMatch && !isGreetingOnly) {
           await sendWhatsAppMessage1(userPhone, 
-            `Hey there! 😊 I couldn't understand your message.\n\nTo book a trip, please include:\n- Trip Name (e.g. "Trip: Northeast India Wildlife Safari")\n- Trip Date (e.g. "Trip Date: 09-Jul-25")\n- Experience Code (e.g. "(Experience Code: 20B1L)")\n\nFeel free to reply with "Hi" to restart.`);
+            `Hey there! 😊 I couldn't understand your message.\n\nYou can explore all our amazing trips at 🌐 Tripuva.com\n\nOr just reply with "Hi" to get started! 🚀`);
+          
         }
 
        // console.log(dateMatch);
