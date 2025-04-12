@@ -288,7 +288,7 @@ app.post('/razorpaywebhook2', async (req, res) => {
 {/* BEGIN  */}
 
 
-// 🔹 Step 3: Decrement the available slot for the selected date
+// 🔹 Step 1: Decrement the available slot for the selected date
 const { data: packageData, error: fetchPackageError } = await supabase
   .from('packages')
   .select('start_date_2')
@@ -318,6 +318,8 @@ if (fetchPackageError || !packageData?.start_date_2) {
     console.warn(`⚠️ No available slot to decrement for ${bookingPackageDate} or date not found`);
   }
 }
+
+
 
 
 
@@ -525,7 +527,7 @@ async function processRazorpayWebhook(body, signature) {
 
       const { data: packageData, error: fetchPackageError } = await supabase
      .from('packages')
-     .select('start_date_2')
+     .select('start_date_2,advance')
      .eq('package_id', bookingExpCode)
      .single();
         
@@ -558,6 +560,60 @@ async function processRazorpayWebhook(body, signature) {
       console.warn(`⚠️ No available slot to decrement for ${bookingPackageDate} or date not found`);
     }
   }
+  
+    const amount = pkgData.advance * 100;
+
+    onsole.log(`Amount:", ${amount}`);
+
+    // Send WhatsApp message
+
+    const responseMessage2 = ` ✅ Thank you for your payment.\nPayment Id: ${paymentId}\n\nWe’ll confirm your slot shortly and let you know the next steps.\n\nStay tuned 😊`;
+    const responseMessage3 = `A booking payment has been received of ₹${pkg2.advance} for ${bookingPackageName} from ${userName}`;
+
+    const adminPhone = "918094556379";
+
+    await sendWhatsAppMessage1(userPhone, responseMessage2);
+    await sendWhatsAppMessage1(adminPhone, responseMessage3);
+
+    // Step 2: Check if User Exists in Users Table
+
+    let { data: user, error: userError } = await supabase
+        .from('users')
+        .select('user_id')
+        .eq('phone_number', userPhone)
+        .single();
+
+    // Step 3: If User Does Not Exist, Create New User
+
+    if (userError || !user) {
+      console.log(`👤 User ${userPhone} not found. Creating a new user...`);
+
+      const { data: newUser, error: newUserError } = await supabase
+        .from('users')
+        .insert([{ first_name: userFirstName, last_name: userLastName, phone_number: userPhone }])
+        .select('user_id')
+        .single();
+
+      if (newUserError) {
+        console.error('Error creating new user:', newUserError);
+        return res.status(500).json({ error: 'Failed to create user' });
+      }
+
+      user = newUser; // Assign new user data
+      console.log(`✅ New user created: ${userName} (ID: ${user.user_id})`);
+    }
+
+    else {
+      console.log("User already exists");
+    }
+
+
+
+
+
+
+    
+
 
 
     }
