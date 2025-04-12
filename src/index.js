@@ -45,7 +45,7 @@ app.post("/webhook", async (req, res) => {
         const isManageBooking = manageBooking.toLowerCase().includes(trimmedMessage);
 
 
-        if (!packageNameMatch && !expCodeMatch && !dateMatch && !isGreetingOnly && !isManageBooking) {
+        if (!packageNameMatch && !expCodeMatch && !dateMatch && !isGreetingOnly) {
           await sendWhatsAppMessage1(userPhone, 
             `Hey there! 😊 I couldn't understand your message.\n\nYou can explore all our amazing trips at 🌐 Tripuva.com\n\nOr just reply with "Hi" to get started! 🚀`);
           
@@ -174,34 +174,7 @@ if(pkg1){console.log("Valid Trip");
 
     {/* ********************* Manage Booking ***************************** */}
 
-    if (userMessage.trim().toLowerCase() === 'manage bookings') {
-      // handle booking lookup
-
-      const { data: user, error: userError } = await supabase
-      .from('users')
-      .select('booking_user_id, booked_package')
-      .eq('phone_number', userPhone)
-      .single();
-
-      if (userError || !user) {
-        await sendWhatsAppMessage1(userPhone, `😕 Couldn't find your account. Please try booking again or reply with "Hi" to restart.`);
-        return res.status(404).json({ error: 'User not found' });
-      }
-
-      if (!user.booked_package || user.booked_package.length === 0) {
-        await sendWhatsAppMessage1(userPhone, `🧳 You haven't booked any trips yet.\n\nExplore exciting trips at Tripuva.com 🌍 or reply with "Hi" to get started.`);
-        return res.status(200).json({ message: 'No bookings' });
-      }
-
-      const packageList = user.booked_package.map((pkg, index) => `${index + 1}. ${pkg}`).join('\n');
-
-      const response = `📚 Here are your booked trips:\n\n${packageList}\n\nNeed help managing any of these? Just reply with "Hi" or visit Tripuva.com`;
-
-      await sendWhatsAppMessage1(userPhone, response);
-      return res.status(200).json({ message: 'Bookings sent' });
-
-    }
-      
+   
   } catch (error) {
       console.error("Error processing webhook:", error);
       if (!res.headersSent) {
@@ -509,7 +482,7 @@ app.post('/interakt-webhook', async (req, res) => {
 
     // Fallback for unmatched messages
     return res.status(200).json({
-      message: `🤖 I'm here to help! Reply with "Manage Bookings" or visit Tripuva.com to explore more.`
+      message: `I'm here to help! Reply with "Manage Bookings" or visit Tripuva.com to explore more.`
     });
 
   } catch (err) {
