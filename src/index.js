@@ -50,13 +50,7 @@ app.post("/webhook", async (req, res) => {
             `Hey there! 😊 I couldn't understand your message.\n\nYou can explore all our amazing trips at 🌐 Tripuva.com\n\nOr just reply with "Hi" to get started! 🚀`);
           
         }
-
-       // console.log(dateMatch);
         
-        
-
-
-
 {/*  Trip Details Check  - Begin*/}
 
 
@@ -75,24 +69,24 @@ if (packageNameMatch && expCodeMatch && dateMatch)
 
     const packageNameId = userPackageId.trim();
 
-const { data: pkg3, error: pkgError3 } = await supabase
+const { data: pkg1, error: pkgError1 } = await supabase
   .rpc('check_date_in_start_date_2', {
     pkg_id: userPackageId,
     date_to_check: packageDate,
   });
 
-if (pkgError3) {
-  console.error('Error checking date in start_date_2:', pkgError3);
+if (pkgError1) {
+  console.error('Error checking date in start_date_2:', pkgError1);
   return res.status(500).json({ error: 'Something went wrong checking the date' });
 }
   
-if (!pkg3 || pkg3.length === 0) {
+if (!pkg1 || pkg1.length === 0) {
     const notFoundMsg = "No matching trip found 😔\n\nPlease check the trip details\n\nYou can explore more trips at Tripuva.com 🚀";
     await sendWhatsAppMessage1(userPhone, notFoundMsg);
     return res.status(404).json({ error: "Package not found" });
   }
 
-if(pkg3){console.log("Valid Trip");
+if(pkg1){console.log("Valid Trip");
 
   }
 
@@ -111,24 +105,24 @@ if(pkg3){console.log("Valid Trip");
 
       
 
-      const { data: pkgData, error: pkgError } = await supabase
+      const { data: pkg2, error: pkgError2 } = await supabase
       .from('packages')
       .select('advance,title')
       .eq('title', packagen)
       .eq('package_id', packageNameId);
       
 
-    if (pkgError) {
-      console.error("Supabase query error:",pkgError);
+    if (pkgError2) {
+      console.error("Supabase query error:",pkgError2);
       return res.status(500).json({error: "Database error"});
     }
-    if (!pkgData || pkgData.length === 0) {
+    if (!pkg2 || pkg2.length === 0) {
       console.warn("Package not found");
       await sendWhatsAppMessage1(userPhone, packageNotFoundMessage);
       return res.status(404).json({ error: 'Package not found' });
     }
 
-    const pkg = pkgData[0];
+    const pkg = pkg2[0];
 
     const packageAmount = pkg.advance
     const packageName = pkg.title
@@ -474,6 +468,55 @@ async function processRazorpayWebhook(body, signature) {
   }
 
 }
+
+
+app.post('/interakt-webhook', async (req, res) => {
+  try {
+    const userPhone = req.body?.sender?.phone;
+    const userMessage = req.body?.message?.text?.trim().toLowerCase();
+
+    if (!userPhone || !userMessage) {
+      return res.status(400).json({ message: 'Missing phone number or message' });
+    }
+
+    if (userMessage === 'manage bookings') {
+      const { data: user, error: userError } = await supabase
+        .from('users')
+        .select('booking_user_id, booked_package')
+        .eq('phone_number', userPhone)
+        .single();
+
+      if (userError || !user) {
+        return res.status(200).json({
+          message: `😕 Couldn't find your account. Please try booking again or reply with "Hi" to restart.`
+        });
+      }
+
+      if (!user.booked_package || user.booked_package.length === 0) {
+        return res.status(200).json({
+          message: `🧳 You haven't booked any trips yet.\n\nExplore exciting trips at Tripuva.com 🌍 or reply with "Hi" to get started.`
+        });
+      }
+
+      const packageList = user.booked_package
+        .map((pkg, i) => `${i + 1}. ${pkg}`)
+        .join('\n');
+
+      return res.status(200).json({
+        message: `📚 Here are your booked trips:\n\n${packageList}\n\nNeed help managing any of these? Just reply with "Hi" or visit Tripuva.com`
+      });
+    }
+
+    // Fallback for unmatched messages
+    return res.status(200).json({
+      message: `🤖 I'm here to help! Reply with "Manage Bookings" or visit Tripuva.com to explore more.`
+    });
+
+  } catch (err) {
+    console.error("❌ Error handling Interakt webhook:", err);
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+});
 
 
 app.get('/health', (req, res) => {
