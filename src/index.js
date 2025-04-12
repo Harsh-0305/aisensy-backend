@@ -41,7 +41,7 @@ app.post("/webhook", async (req, res) => {
         const trimmedMessage = userMessage.trim().toLowerCase();
         const greetings = ['hi', 'hello', 'hey'];
         const isGreetingOnly = greetings.includes(trimmedMessage);
-        const manageBooking = 'manage booking';
+        const manageBooking = 'manage bookings';
         const isManageBooking = manageBooking.includes(trimmedMessage);
 
 
@@ -180,7 +180,7 @@ if(pkg3){console.log("Valid Trip");
 
     {/* ********************* Manage Booking ***************************** */}
 
-    if (userMessage.trim().toLowerCase() === 'manage booking') {
+    if (userMessage.trim().toLowerCase() === 'manage bookings') {
       // handle booking lookup
 
       const { data: user, error: userError } = await supabase
