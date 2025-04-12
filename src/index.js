@@ -204,7 +204,7 @@ if(pkg1){console.log("Valid Trip");
 
     {/* ********************* Manage Booking ***************************** */}
 
-    if (userMessage === 'manage bookings') {
+    if (buttonTitle === 'manage bookings') {
       // handle booking lookup
 
       const { data: user, error: userError } = await supabase
