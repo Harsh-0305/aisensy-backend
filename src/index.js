@@ -212,10 +212,6 @@ if(pkg1){console.log("Valid Trip");
     if (buttonTitle === 'manage bookings') {
       // handle booking lookup
 
-      console.log("Checking user bookings.....");
-      console.log(userPhone);
-
-      console.log('userPhone:', userPhone, typeof userPhone);
 
       const { data: user, error: userError } = await supabase
       .from('users')
@@ -224,19 +220,18 @@ if(pkg1){console.log("Valid Trip");
 
       console.log('Matching users:', user);
 
-      const userr= user;
 
       if (userError || !user) {
         await sendWhatsAppMessage1(userPhone, `😕 Couldn't find your account. Please try booking again or reply with "Hi" to restart.`);
         return res.status(404).json({ error: 'User not found' });
       }
 
-      if (!user.booked_package || user.booked_package.length === 0) {
+      if (!user.booked_packages || user.booked_packages.length === 0) {
         await sendWhatsAppMessage1(userPhone, `🧳 You haven't booked any trips yet.\n\nExplore exciting trips at Tripuva.com 🌍 or reply with "Hi" to get started.`);
         return res.status(200).json({ message: 'No bookings' });
       }
 
-      const packageList = user.booked_package.map((pkg, index) => `${index + 1}. ${pkg}`).join('\n');
+      const packageList = user.booked_packages.map((pkg, index) => `${index + 1}. ${pkg}`).join('\n');
 
       const response = `📚 Here are your booked trips:\n\n${packageList}\n\nNeed help managing any of these? Just reply with "Hi" or visit Tripuva.com`;
 
