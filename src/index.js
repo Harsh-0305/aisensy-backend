@@ -34,7 +34,7 @@ app.post("/webhook", async (req, res) => {
       const userPhone = `+91${req.body.data.customer.phone_number}`
       const userMessage = req.body.data.message.message;
 
-      let userMessage2 = req.body.data.message?.text?.body?.trim().toLowerCase() || '';
+      
       let buttonTitle = '';
 
       const rawMessage = req.body.data.message?.message || '';
@@ -56,6 +56,8 @@ app.post("/webhook", async (req, res) => {
         userMessage = buttonTitle;
       }
 
+      if(buttonTitle !== 'manage bookings'){
+
       console.log("Final interpreted message:", userMessage);
 
       console.log(userMessage);
@@ -71,13 +73,13 @@ app.post("/webhook", async (req, res) => {
         const isManageBooking = manageBooking === buttonTitle
 
         console.log('userMessage:', userMessage);
-console.log('trimmedMessage:', trimmedMessage);
-console.log('isManageBooking:', isManageBooking);
+        console.log('trimmedMessage:', trimmedMessage);
+        console.log('isManageBooking:', isManageBooking);
 
 
         if (!packageNameMatch && !expCodeMatch && !dateMatch && !isGreetingOnly && !isManageBooking) {
           await sendWhatsAppMessage1(userPhone, 
-            `Hey there! 😊 I couldn't understand your message.\n\nYou can explore all our amazing trips at 🌐 Tripuva.com\n\nOr just reply with "Hi" to get started! 🚀`);
+            `Hey there! 😊 I couldn't understand your message.\n\nYou can explore all our amazing trips at ⛰️ Tripuva.com\n\nOr just reply with "Hi" to get started! 🚀`);
           
         }
         
@@ -201,6 +203,7 @@ if(pkg1){console.log("Valid Trip");
         paymentId: response.data.id
       }); // Print response in console 
     }
+  }
 
     {/* ********************* Manage Booking ***************************** */}
 
@@ -393,14 +396,14 @@ async function processRazorpayWebhook(body, signature) {
     }
   }
   
-    const amount = pkgData.advance * 100;
+    const amount = packageData.advance * 100;
 
-    onsole.log(`Amount:", ${amount}`);
+    console.log(`Amount:", ${amount}`);
 
     // Send WhatsApp message
 
     const responseMessage2 = ` ✅ Thank you for your payment.\nPayment Id: ${paymentId}\n\nWe’ll confirm your slot shortly and let you know the next steps.\n\nStay tuned 😊`;
-    const responseMessage3 = `A booking payment has been received of ₹${pkg2.advance} for ${bookingPackageName} from ${userName}`;
+    const responseMessage3 = `A booking payment has been received of ₹${amount} for ${bookingPackageName} from ${userName}`;
 
     const adminPhone = "918094556379";
 
@@ -498,55 +501,6 @@ async function processRazorpayWebhook(body, signature) {
   }
 
 }
-
-
-app.post('/interakt-webhook', async (req, res) => {
-  try {
-    const userPhone = req.body?.sender?.phone;
-    const userMessage = req.body?.message?.text?.trim().toLowerCase();
-
-    if (!userPhone || !userMessage) {
-      return res.status(400).json({ message: 'Missing phone number or message' });
-    }
-
-    if (userMessage === 'manage bookings') {
-      const { data: user, error: userError } = await supabase
-        .from('users')
-        .select('booking_user_id, booked_package')
-        .eq('phone_number', userPhone)
-        .single();
-
-      if (userError || !user) {
-        return res.status(200).json({
-          message: `😕 Couldn't find your account. Please try booking again or reply with "Hi" to restart.`
-        });
-      }
-
-      if (!user.booked_package || user.booked_package.length === 0) {
-        return res.status(200).json({
-          message: `🧳 You haven't booked any trips yet.\n\nExplore exciting trips at Tripuva.com 🌍 or reply with "Hi" to get started.`
-        });
-      }
-
-      const packageList = user.booked_package
-        .map((pkg, i) => `${i + 1}. ${pkg}`)
-        .join('\n');
-
-      return res.status(200).json({
-        message: `📚 Here are your booked trips:\n\n${packageList}\n\nNeed help managing any of these? Just reply with "Hi" or visit Tripuva.com`
-      });
-    }
-
-    // Fallback for unmatched messages
-    return res.status(200).json({
-      message: `I'm here to help! Reply with "Manage Bookings" or visit Tripuva.com to explore more.`
-    });
-
-  } catch (err) {
-    console.error("❌ Error handling Interakt webhook:", err);
-    return res.status(500).json({ message: 'Internal server error' });
-  }
-});
 
 
 app.get('/health', (req, res) => {
