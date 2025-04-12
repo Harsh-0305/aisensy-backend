@@ -220,7 +220,7 @@ if(pkg1){console.log("Valid Trip");
 
       console.log('Matching users:', user);
       console.log(user.booked_packages);
-      console.log(user.booked_packages.length);
+  
 
 
       if (userError || !user) {
@@ -228,7 +228,7 @@ if(pkg1){console.log("Valid Trip");
         return res.status(404).json({ error: 'User not found' });
       }
 
-      if (!user.booked_packages || user.booked_packages.length === 0) {
+      if (!user.booked_packages) {
         await sendWhatsAppMessage1(userPhone, `🧳 You haven't booked any trips yet.\n\nExplore exciting trips at Tripuva.com 🌍 or reply with "Hi" to get started.`);
         return res.status(200).json({ message: 'No bookings' });
       }
