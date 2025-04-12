@@ -47,21 +47,27 @@ app.post("/webhook", async (req, res) => {
             `Hey there! 😊 I couldn't understand your message.\n\nTo book a trip, please include:\n- Trip Name (e.g. "Trip: Northeast India Wildlife Safari")\n- Trip Date (e.g. "Trip Date: 09-Jul-25")\n- Experience Code (e.g. "(Experience Code: 20B1L)")\n\nFeel free to reply with "Hi" to restart.`);
         }
 
-        console.log(dateMatch);
+       // console.log(dateMatch);
         
-        const packagen = packageNameMatch ? packageNameMatch[1].trim() : null;
-        const packageDate = dateMatch ? dateMatch[1] : null;
         
-
-let userPackageId = "";
-
-if (expCodeMatch && expCodeMatch[1]) {
-  userPackageId = expCodeMatch[1];
-}
 
 const packageNameId = userPackageId.trim();
 
 {/*  Trip Details Check  - Begin*/}
+
+
+if (packageNameMatch && expCodeMatch && dateMatch)
+  {
+
+    const packagen = packageNameMatch ? packageNameMatch[1].trim() : null;
+    const packageDate = dateMatch ? dateMatch[1] : null;
+        
+
+    let userPackageId = "";
+
+    if (expCodeMatch && expCodeMatch[1]) {
+        userPackageId = expCodeMatch[1];
+    }
 
 const { data: pkg3, error: pkgError3 } = await supabase
   .rpc('check_date_in_start_date_2', {
@@ -73,21 +79,18 @@ if (pkgError3) {
   console.error('Error checking date in start_date_2:', pkgError3);
   return res.status(500).json({ error: 'Something went wrong checking the date' });
 }
-
-  if (pkgError3) {
-    console.error("Supabase query error:", pkgError3);
-    return res.status(500).json({ error: "Database error" });
-  }
   
-  if (!pkg3 || pkg3.length === 0) {
+if (!pkg3 || pkg3.length === 0) {
     const notFoundMsg = "No matching trip found 😔\n\nPlease check the trip details\n\nYou can explore more trips at Tripuva.com 🚀";
     await sendWhatsAppMessage1(userPhone, notFoundMsg);
     return res.status(404).json({ error: "Package not found" });
   }
 
-  if(pkg3){console.log("Valid Trip");
+if(pkg3){console.log("Valid Trip");
 
   }
+
+}
 
   {/*  Trip Details Check  - End*/}
 
