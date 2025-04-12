@@ -222,7 +222,7 @@ if(pkg1){console.log("Valid Trip");
       .select('booking_user_id')
       .eq('phone_number', userPhone.trim());
 
-      console.log('Matching users:', users);
+      console.log('Matching users:', user);
 
       const userr= user;
 
