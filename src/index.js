@@ -174,6 +174,36 @@ if(pkg3){console.log("Valid Trip");
         paymentId: response.data.id
       }); // Print response in console 
     }
+
+    {/* ********************* Manage Booking ***************************** */}
+
+    if (userMessage.trim().toLowerCase() === 'manage booking') {
+      // handle booking lookup
+
+      const { data: user, error: userError } = await supabase
+      .from('users')
+      .select('booking_user_id, booked_package')
+      .eq('phone_number', userPhone)
+      .single();
+
+      if (userError || !user) {
+        await sendWhatsAppMessage1(userPhone, `😕 Couldn't find your account. Please try booking again or reply with "Hi" to restart.`);
+        return res.status(404).json({ error: 'User not found' });
+      }
+
+      if (!user.booked_package || user.booked_package.length === 0) {
+        await sendWhatsAppMessage1(userPhone, `🧳 You haven't booked any trips yet.\n\nExplore exciting trips at Tripuva.com 🌍 or reply with "Hi" to get started.`);
+        return res.status(200).json({ message: 'No bookings' });
+      }
+
+      const packageList = user.booked_package.map((pkg, index) => `${index + 1}. ${pkg}`).join('\n');
+
+      const response = `📚 Here are your booked trips:\n\n${packageList}\n\nNeed help managing any of these? Just reply with "Hi" or visit Tripuva.com`;
+
+      await sendWhatsAppMessage1(userPhone, response);
+      return res.status(200).json({ message: 'Bookings sent' });
+
+    }
       
   } catch (error) {
       console.error("Error processing webhook:", error);
