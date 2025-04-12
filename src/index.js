@@ -38,6 +38,15 @@ app.post("/webhook", async (req, res) => {
         const expCodeMatch = userMessage.match(/\(?\s*Experience\s*code[:\s]*([A-Z0-9]+)\s*\)?/i);
         const dateMatch = userMessage.match(/Trip\s*Date[:\s]*([0-9]{2}-[A-Za-z]{3}-[0-9]{2})/i);
 
+        const trimmedMessage = userMessage.trim().toLowerCase();
+        const greetings = ['hi', 'hello', 'hey'];
+        const isGreetingOnly = greetings.includes(trimmedMessage);
+
+        if (!packageNameMatch && !expCodeMatch && !dateMatch && !isGreetingOnly) {
+          await sendWhatsAppMessage1(userPhone, 
+            `Hey there! 😊 I couldn't understand your message.\n\nTo book a trip, please include:\n- Trip Name (e.g. "Trip: Northeast India Wildlife Safari")\n- Trip Date (e.g. "Trip Date: 09-Jul-25")\n- Experience Code (e.g. "(Experience Code: 20B1L)")\n\nFeel free to reply with "Hi" to restart.`);
+        }
+
         console.log(dateMatch);
         
         const packagen = packageNameMatch ? packageNameMatch[1].trim() : null;
