@@ -41,7 +41,7 @@ app.post("/webhook", async (req, res) => {
         const trimmedMessage = userMessage.trim().toLowerCase();
         const greetings = ['hi', 'hello', 'hey'];
         const isGreetingOnly = greetings.includes(trimmedMessage);
-        const manageBooking = 'manage bookings';
+        const manageBooking = 'Manage Bookings';
         const isManageBooking = manageBooking.includes(trimmedMessage);
 
 
