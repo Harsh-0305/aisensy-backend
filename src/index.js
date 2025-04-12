@@ -212,11 +212,16 @@ if(pkg1){console.log("Valid Trip");
     if (buttonTitle === 'manage bookings') {
       // handle booking lookup
 
+      console.log("Checking user bookings.....");
+      console.log(userPhone);
+
       const { data: user, error: userError } = await supabase
       .from('users')
       .select('booking_user_id, booked_package')
       .eq('phone_number', userPhone)
       .single();
+
+      console.log(user.phone_number);
 
       if (userError || !user) {
         await sendWhatsAppMessage1(userPhone, `😕 Couldn't find your account. Please try booking again or reply with "Hi" to restart.`);
