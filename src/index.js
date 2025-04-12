@@ -34,7 +34,7 @@ app.post("/webhook", async (req, res) => {
       const userPhone = `+91${req.body.data.customer.phone_number}`
       const userMessage = req.body.data.message.message;
 
-      
+      let userMessage2 = req.body.data.message?.text?.body?.trim().toLowerCase() || '';
       let buttonTitle = '';
 
       const rawMessage = req.body.data.message?.message || '';
@@ -68,7 +68,7 @@ app.post("/webhook", async (req, res) => {
         const greetings = ['hi', 'hello', 'hey'];
         const isGreetingOnly = greetings.includes(trimmedMessage);
         const manageBooking = 'Manage Bookings';
-        const isManageBooking = manageBooking.toLowerCase().includes(trimmedMessage);
+        const isManageBooking = manageBooking === buttonTitle
 
         console.log('userMessage:', userMessage);
 console.log('trimmedMessage:', trimmedMessage);
