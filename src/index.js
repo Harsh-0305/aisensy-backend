@@ -34,6 +34,11 @@ app.post("/webhook", async (req, res) => {
       const userPhone = `+91${req.body.data.customer.phone_number}`
       const userMessage = req.body.data.message.message;
 
+      const userMessage2 = req.body.message?.text?.body?.trim().toLowerCase() || '';
+      const buttonTitle = req.body.payload?.title?.trim().toLowerCase();
+
+      console.log("Title of button: ",buttonTitle);
+
       console.log(userMessage);
 
         const packageNameMatch = userMessage.match(/Trip:\s*(.+)/i);
