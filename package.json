@@ -10,7 +10,7 @@
     "lint:fix": "eslint src/ --fix",
     "format": "prettier --write 'src/**/*.{js,json}'",
     "prepare": "husky install",
-    "build": "npm install && npm run lint && npm run format"
+    "build": "npm install && npm run lint:fix && npm run format"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.39.3",
