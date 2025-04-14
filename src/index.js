@@ -4,11 +4,15 @@ import dotenv from 'dotenv';
 import { createClient } from '@supabase/supabase-js'; // Missing supabase client
 import fetch from 'node-fetch'; // Missing fetch import
 import crypto from 'crypto';
+import webhookRoutes from './routes/webhook.routes.js';
+import { errorHandler } from './middleware/error.middleware.js';
+import { requestLogger } from './middleware/logging.middleware.js';
 
 dotenv.config();
 
 const app = express();
 app.use(express.json());
+app.use(requestLogger);
 
 // Initialize Supabase client
 const supabase = createClient(
@@ -16,6 +20,8 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY
 );
 
+// Routes
+app.use('/', webhookRoutes);
 
 app.post("/webhook", async (req, res) => {
   try {
@@ -129,7 +135,7 @@ if(pkg1){console.log("Valid Trip");
   {/*  Trip Details Check  - End*/}
 
 
-// const packageNotFoundMessage = `We couldn’t find any trips matching the provided details. Please double-check the information or explore available options at Tripuva.com`;
+// const packageNotFoundMessage = `We couldn't find any trips matching the provided details. Please double-check the information or explore available options at Tripuva.com`;
 
 
       console.log("Name", userName);
@@ -411,7 +417,7 @@ async function processRazorpayWebhook(body, signature) {
 
     // Send WhatsApp message
 
-    const responseMessage2 = ` ✅ Thank you for your payment.\nPayment Id: ${paymentId}\n\nWe’ll confirm your slot shortly and let you know the next steps.\n\nStay tuned 😊`;
+    const responseMessage2 = ` ✅ Thank you for your payment.\nPayment Id: ${paymentId}\n\nWe'll confirm your slot shortly and let you know the next steps.\n\nStay tuned 😊`;
     const responseMessage3 = `A booking payment has been received of ₹${amount} for ${bookingPackageName} from ${userName}`;
 
     const adminPhone = "918094556379";
@@ -517,6 +523,9 @@ app.get('/health', (req, res) => {
   console.log('Health check received at:', new Date().toISOString());
   res.status(200).send('OK');
 });
+
+// Error handling middleware (should be last)
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
