@@ -237,7 +237,7 @@ if(pkg1){console.log("Valid Trip");
 
       const packageList = user.booked_packages.map((pkg, index) => `${index + 1}. ${pkg}`).join('\n');
 
-      const response = `📚 Here are your booked trips:\n\n${packageList}\n\nNeed help managing any of these? Just reply with "Hi" or visit Tripuva.com`;
+      const response = `🗺️ Here are your booked trips:\n\n${packageList}\n\nIf you have any questions about your trips, feel free to drop us a message`;
 
       await sendWhatsAppMessage1(userPhone, response);
       return res.status(200).json({ message: 'Bookings sent' });
