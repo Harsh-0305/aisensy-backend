@@ -477,7 +477,7 @@ async function processRazorpayWebhook(body, signature) {
         const { data: userData, error: fetchError } = await supabase
         .from('users')
         .select('booked_packages')
-        .eq('booking_user_id', user.user_id)
+        .eq('user_id', user.user_id)
         .single();
 
         if (fetchError) {
@@ -486,12 +486,12 @@ async function processRazorpayWebhook(body, signature) {
         else {
 
         // Step 2: Append the new package
-        const updatedPackages = [...(userData.booked_package || []), bookingPackageName];
+        const updatedPackages = [...(userData.booked_packages || []), bookingPackageName];
 
         // Step 3: Update the array
         const { error: updateError } = await supabase
         .from('users')
-       .update({ booked_package: updatedPackages })
+       .update({ booked_packages: updatedPackages })
        .eq('user_id', user.user_id);
 
        if (updateError) {
