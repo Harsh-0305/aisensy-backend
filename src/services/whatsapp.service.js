@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { whatsappConfig } from '../config/whatsapp.js';
+import { logger } from '../utils/logger.js';
 
 export class WhatsAppService {
     static async sendTextMessage(phone, message) {
@@ -7,10 +8,10 @@ export class WhatsAppService {
             const response = await axios.post(
                 whatsappConfig.apiUrl,
                 {
-                    userId: "",
+                    userId: '',
                     fullPhoneNumber: phone,
-                    callbackData: "response_sent",
-                    type: "Text",
+                    callbackData: 'response_sent',
+                    type: 'Text',
                     data: {
                         message: message,
                         preview_url: false
@@ -20,10 +21,10 @@ export class WhatsAppService {
                     headers: whatsappConfig.headers
                 }
             );
-            console.log("Message sent successfully:", response.data);
+            logger.info('Message sent successfully:', response.data);
             return response.data;
         } catch (error) {
-            console.error("Error sending message:", error.response?.data || error);
+            logger.error('Error sending message:', error.response?.data || error);
             throw error;
         }
     }
@@ -33,13 +34,13 @@ export class WhatsAppService {
             const response = await axios.post(
                 whatsappConfig.apiUrl,
                 {
-                    userId: "",
+                    userId: '',
                     fullPhoneNumber: phone,
-                    callbackData: "response_sent",
-                    type: "Image",
+                    callbackData: 'response_sent',
+                    type: 'Image',
                     data: {
                         caption: message,
-                        mediaUrl: imageUrl || "https://oahorqgkqbcslflkqhiv.supabase.co/storage/v1/object/public/package-assets/static%20assets/Tripuva%20(9).png",
+                        mediaUrl: imageUrl || 'https://oahorqgkqbcslflkqhiv.supabase.co/storage/v1/object/public/package-assets/static%20assets/Tripuva%20(9).png',
                         message: message
                     }
                 },
@@ -47,10 +48,10 @@ export class WhatsAppService {
                     headers: whatsappConfig.headers
                 }
             );
-            console.log("✅ Image sent successfully:", response.data);
+            logger.info('Image sent successfully:', response.data);
             return response.data;
         } catch (error) {
-            console.error("❌ Error sending image:", error.response?.data || error);
+            logger.error('Error sending image:', error.response?.data || error);
             throw error;
         }
     }
