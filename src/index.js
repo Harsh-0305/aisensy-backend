@@ -462,6 +462,7 @@ async function processRazorpayWebhook(body, signature) {
         booking_adv_status: 'Paid',
         booking_package_start_date: bookingPackageDate,
         booking_rm_status: 'Pending', // Assuming remaining payment is still pending
+        booking_user_phone: userPhone
       }
     ]);
 
@@ -475,7 +476,7 @@ async function processRazorpayWebhook(body, signature) {
 
         const { data: userData, error: fetchError } = await supabase
         .from('users')
-        .select('booked_package')
+        .select('booked_packages')
         .eq('booking_user_id', user.user_id)
         .single();
 
