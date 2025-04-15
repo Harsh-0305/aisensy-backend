@@ -58,7 +58,6 @@ export class BookingService {
             packageId: packageId,
             packageName: packageName,
             startDate: date,
-            userPhone: userPhone,
         });
 
         // Update user's booked packages

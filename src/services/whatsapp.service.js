@@ -16,14 +16,26 @@ export class WhatsAppService {
         const response = await axios.post(
           whatsappConfig.apiUrl,
           {
-            countryCode: "+91",
-            phoneNumber: phone.replace("+91", ""),
+            userId: "",
+            fullPhoneNumber: phone,
             callbackData: "response_sent",
             type: "InteractiveButton",
             data: {
-              message: message.data.message.body.text,
-              preview_url: false,
-              buttons: message.data.message.action.buttons
+              message: {
+                type: "button",
+                body: {
+                  text: message.data.message.body.text
+                },
+                action: {
+                  buttons: message.data.message.action.buttons.map(button => ({
+                    type: "reply",
+                    reply: {
+                      id: button.reply.id,
+                      title: button.reply.title
+                    }
+                  }))
+                }
+              }
             },
           },
           {
@@ -43,13 +55,12 @@ export class WhatsAppService {
       const response = await axios.post(
         whatsappConfig.apiUrl,
         {
-          countryCode: "+91",
-          phoneNumber: phone.replace("+91", ""),
+          userId: "",
+          fullPhoneNumber: phone,
           callbackData: "response_sent",
           type: "Text",
           data: {
-            message: message,
-            preview_url: false,
+            message: message
           },
         },
         {
@@ -74,8 +85,8 @@ export class WhatsAppService {
       const response = await axios.post(
         whatsappConfig.apiUrl,
         {
-          countryCode: "+91",
-          phoneNumber: phone.replace("+91", ""),
+          userId: "",
+          fullPhoneNumber: phone,
           callbackData: "response_sent",
           type: "Image",
           data: {

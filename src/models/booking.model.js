@@ -12,7 +12,6 @@ export class BookingModel {
         booking_adv_status: bookingData.advanceStatus || "Paid",
         booking_package_start_date: bookingData.startDate,
         booking_rm_status: bookingData.remainingStatus || "Pending",
-        booking_user_phone: bookingData.userPhone,
       },
     ]);
 
