@@ -4,7 +4,7 @@ export class UserModel {
   static async findByPhone(phoneNumber) {
     const { data, error } = await supabase
       .from("users")
-      .select("user_id,booked_packages")
+      .select("user_id, first_name, last_name, phone_number")
       .eq("phone_number", phoneNumber)
       .single();
 
@@ -15,8 +15,12 @@ export class UserModel {
   static async create(userData) {
     const { data, error } = await supabase
       .from("users")
-      .insert([userData])
-      .select("user_id")
+      .insert([{
+        first_name: userData.first_name,
+        last_name: userData.last_name,
+        phone_number: userData.phone_number
+      }])
+      .select("user_id, first_name, last_name, phone_number")
       .single();
 
     if (error) throw error;

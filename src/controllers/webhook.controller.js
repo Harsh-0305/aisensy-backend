@@ -83,32 +83,30 @@ export class WebhookController {
         return res.status(200).json({ message: "Invalid request handled" });
       }
 
-      if (isGreetingOnly) {
-        // Only send greeting if it's not a button click
-        if (!buttonTitle) {
-          await WhatsAppService.sendTextMessage(userPhone, {
-            type: "InteractiveButton",
-            data: {
-              message: {
-                type: "button",
-                body: {
-                  text: `Hey ${userName} ! 👋\n\nWelcome to Tripuva! 🌍✨\n\nWe help you find amazing group travel experiences across India. Check out our latest trips. 🚀\n\nExplore Group Trips: Tripuva.com`
-                },
-                action: {
-                  buttons: [
-                    {
-                      type: "reply",
-                      reply: {
-                        id: "manage_bookings",
-                        title: "Manage Bookings"
-                      }
+      // Handle greeting only if it's not a button click and not already processed
+      if (isGreetingOnly && !buttonTitle) {
+        await WhatsAppService.sendTextMessage(userPhone, {
+          type: "InteractiveButton",
+          data: {
+            message: {
+              type: "button",
+              body: {
+                text: `Hey ${userName} ! 👋\n\nWelcome to Tripuva! 🌍✨\n\nWe help you find amazing group travel experiences across India. Check out our latest trips. 🚀\n\nExplore Group Trips: Tripuva.com`
+              },
+              action: {
+                buttons: [
+                  {
+                    type: "reply",
+                    reply: {
+                      id: "manage_bookings",
+                      title: "Manage Bookings"
                     }
-                  ]
-                }
+                  }
+                ]
               }
             }
-          });
-        }
+          }
+        });
         return res.status(200).json({ message: "Greeting handled" });
       }
 
@@ -236,7 +234,10 @@ export class WebhookController {
         return res.status(404).json({ error: "User not found" });
       }
 
-      if (!user.booked_packages || user.booked_packages.length === 0) {
+      // Get bookings from bookings table
+      const bookings = await BookingService.getBookingsByPhone(userPhone);
+
+      if (!bookings || bookings.length === 0) {
         await WhatsAppService.sendTextMessage(userPhone, {
           type: "InteractiveButton",
           data: {
@@ -262,9 +263,9 @@ export class WebhookController {
         return res.status(200).json({ message: "No bookings" });
       }
 
-      // Format the package list with proper numbering and line breaks
-      const packageList = user.booked_packages
-        .map((pkg, index) => `${index + 1}. ${pkg}`)
+      // Format the booking list with proper numbering and line breaks
+      const bookingList = bookings
+        .map((booking, index) => `${index + 1}. ${booking.booking_package_name} (${booking.booking_package_start_date})`)
         .join("\n\n");
 
       await WhatsAppService.sendTextMessage(userPhone, {
@@ -273,7 +274,7 @@ export class WebhookController {
           message: {
             type: "button",
             body: {
-              text: `🗺️ Here are your booked trips:\n\n${packageList}\n\nNeed help managing any of these? Just reply with "Hi" or visit Tripuva.com`
+              text: `🗺️ Here are your booked trips:\n\n${bookingList}\n\nNeed help managing any of these? Just reply with "Hi" or visit Tripuva.com`
             },
             action: {
               buttons: [
@@ -378,10 +379,9 @@ export class WebhookController {
       });
 
       // Send payment success message with image
-      await WhatsAppService.sendImageMessage(
+      await WhatsAppService.sendTextMessage(
         userPhone,
-        `✨ Thank you for your Payment! ✨\n\nPayment Details:\n📝 ID: ${paymentId}\n💰 Amount: ₹${entity.amount / 100}\n\nThank you for your payment! We're processing your booking request and will confirm your slot shortly.\n\nWe'll keep you updated on the next steps. 😊`,
-        "https://oahorqgkqbcslflkqhiv.supabase.co/storage/v1/object/public/package-assets/static%20assets/Tripuva%20(9).png"
+        `✨ Thank you for your Payment! ✨\n\nPayment Details:\n📝 ID: ${paymentId}\n💰 Amount: ₹${entity.amount / 100}\n\nWe're processing your booking request and will confirm your slot shortly.\n\nWe'll keep you updated on the next steps. 😊`
       );
     } catch (error) {
       logger.error("Webhook processing failed:", error);

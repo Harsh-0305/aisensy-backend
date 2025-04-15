@@ -21,7 +21,7 @@ export const MESSAGES = {
   PACKAGE_NOT_FOUND:
     "No matching trip found 😔\n\nPlease check the trip details\n\nYou can explore more trips at Tripuva.com 🚀",
   PAYMENT_SUCCESS:
-    "✅ Thank you for your payment.\nWe'll confirm your slot shortly and let you know the next steps.\n\nStay tuned 😊",
+    "✨ Thank you for your Payment! ✨\n\nPayment Details:\n📝 ID: {paymentId}\n💰 Amount: ₹{amount}\n\nWe're processing your booking request and will confirm your slot shortly.\n\nWe'll keep you updated on the next steps. 😊",
   NO_BOOKINGS:
     '🧳 You haven\'t booked any trips yet.\n\nExplore exciting trips at Tripuva.com 🌍 or reply with "Hi" to get started.',
   USER_NOT_FOUND:

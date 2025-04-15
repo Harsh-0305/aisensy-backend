@@ -430,8 +430,7 @@ async function processRazorpayWebhook(body, signature) {
       console.log(`Amount:", ${amount}`);
 
       // Send WhatsApp message
-
-      const responseMessage2 = ` ✅ Thank you for your payment.\nPayment Id: ${paymentId}\n\nWe'll confirm your slot shortly and let you know the next steps.\n\nStay tuned 😊`;
+      const responseMessage2 = `✨ Thank you for your Payment! ✨\n\nPayment Details:\n📝 ID: ${paymentId}\n💰 Amount: ₹${amount}\n\nWe're processing your booking request and will confirm your slot shortly.\n\nWe'll keep you updated on the next steps. 😊`;
       const responseMessage3 = `A booking payment has been received of ₹${amount} for ${bookingPackageName} from ${userName}`;
 
       const adminPhone = "918094556379";
