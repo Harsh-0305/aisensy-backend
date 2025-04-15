@@ -84,29 +84,31 @@ export class WebhookController {
       }
 
       if (isGreetingOnly) {
-        await WhatsAppService.sendTextMessage(userPhone, {
-          type: "InteractiveButton",
-          data: {
-            message: {
-              type: "button",
-              body: {
-                text: `Hey ${userName} ! 👋\n\nWelcome to Tripuva! 🌍✨\n\nWe help you find amazing group travel experiences across India. Check out our latest trips. 🚀\n\nExplore Group Trips: Tripuva.com`
-              },
-              action: {
-                buttons: [
-                  {
-                    type: "reply",
-                    reply: {
-                      id: "manage_bookings",
-                      title: "Manage Bookings"
+        // Only send greeting if it's not a button click
+        if (!buttonTitle) {
+          await WhatsAppService.sendTextMessage(userPhone, {
+            type: "InteractiveButton",
+            data: {
+              message: {
+                type: "button",
+                body: {
+                  text: `Hey ${userName} ! 👋\n\nWelcome to Tripuva! 🌍✨\n\nWe help you find amazing group travel experiences across India. Check out our latest trips. 🚀\n\nExplore Group Trips: Tripuva.com`
+                },
+                action: {
+                  buttons: [
+                    {
+                      type: "reply",
+                      reply: {
+                        id: "manage_bookings",
+                        title: "Manage Bookings"
+                      }
                     }
-                  }
-                ]
+                  ]
+                }
               }
             }
-          }
-        });
-        
+          });
+        }
         return res.status(200).json({ message: "Greeting handled" });
       }
 
@@ -234,7 +236,7 @@ export class WebhookController {
         return res.status(404).json({ error: "User not found" });
       }
 
-      if (!user.booked_packages) {
+      if (!user.booked_packages || user.booked_packages.length === 0) {
         await WhatsAppService.sendTextMessage(userPhone, {
           type: "InteractiveButton",
           data: {
@@ -260,9 +262,11 @@ export class WebhookController {
         return res.status(200).json({ message: "No bookings" });
       }
 
+      // Format the package list with proper numbering and line breaks
       const packageList = user.booked_packages
         .map((pkg, index) => `${index + 1}. ${pkg}`)
-        .join("\n");
+        .join("\n\n");
+
       await WhatsAppService.sendTextMessage(userPhone, {
         type: "InteractiveButton",
         data: {
