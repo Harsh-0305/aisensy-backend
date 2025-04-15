@@ -1,14 +1,10 @@
 import express from "express";
-import axios from "axios";
 import dotenv from "dotenv";
 import { createClient } from "@supabase/supabase-js"; // Missing supabase client
-import fetch from "node-fetch"; // Missing fetch import
-import crypto from "crypto";
 import webhookRoutes from "./routes/webhook.routes.js";
 import { errorHandler } from "./middleware/error.middleware.js";
 import { requestLogger } from "./middleware/logging.middleware.js";
 import { logger } from "./utils/logger.js";
-import { WebhookController } from "./controllers/webhook.controller.js";
 
 dotenv.config();
 

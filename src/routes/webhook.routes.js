@@ -13,10 +13,6 @@ router.use(requestLogger);
 
 // Webhook routes with validation
 router.post("/webhook", validateWebhookData, WebhookController.handleWebhook);
-router.post(
-  "/razorpaywebhook3",
-  validateRazorpayWebhook,
-  WebhookController.handleRazorpayWebhook,
-);
+router.post("/razorpaywebhook3", validateRazorpayWebhook, WebhookController.handleRazorpayWebhook);
 
 export default router;
