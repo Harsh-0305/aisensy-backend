@@ -82,14 +82,15 @@ export class BookingService {
         packageName,
         amount,
     ) {
-        const userMessage =
-      '✅ Thank you for your payment.\nWe\'ll confirm your slot shortly and let you know the next steps.\n\nStay tuned 😊';
+        // Only send admin notification, user confirmation is handled in webhook controller
         const adminMessage = `A booking payment has been received of ₹${amount} for ${packageName} from ${userName}`;
-
-        await WhatsAppService.sendTextMessage(userPhone, userMessage);
         await WhatsAppService.sendTextMessage(
             process.env.ADMIN_PHONE,
             adminMessage,
         );
+    }
+
+    static async getBookingsByPhone(phoneNumber) {
+        return await BookingModel.getBookingsByPhone(phoneNumber);
     }
 }

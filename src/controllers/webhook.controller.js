@@ -21,69 +21,31 @@ export class WebhookController {
       let buttonTitle = "";
       const rawMessage = data.message?.message || "";
 
+      // Parse button click if present
       if (rawMessage.startsWith("{") && rawMessage.endsWith("}")) {
         try {
           const parsedMessage = JSON.parse(rawMessage);
-          buttonTitle = parsedMessage?.button_reply?.title
-            ?.trim()
-            .toLowerCase();
+          buttonTitle = parsedMessage?.button_reply?.title?.trim().toLowerCase();
         } catch (error) {
           logger.error("Failed to parse button message:", error);
         }
       }
 
+      // If no message but button click exists, use button title as message
       if (!userMessage && buttonTitle) {
         userMessage = buttonTitle;
       }
-
-      // Check for manage bookings (both button and text)
-      if (buttonTitle === "manage bookings" || userMessage.toLowerCase().trim() === "manage bookings") {
-        return await WebhookController.handleManageBookings(userPhone, res);
-      }
-
-      // Process booking request
-      const packageNameMatch = userMessage.match(/Trip:\s*(.+)/i);
-      const expCodeMatch = userMessage.match(
-        /\(?\s*Experience\s*code[:\s]*([A-Z0-9]+)\s*\)?/i,
-      );
-      const dateMatch = userMessage.match(
-        /Trip\s*Date[:\s]*([0-9]{2}-[A-Za-z]{3}-[0-9]{2})/i,
-      );
 
       const trimmedMessage = userMessage.trim().toLowerCase();
       const greetings = ["hi", "hello", "hey"];
       const isGreetingOnly = greetings.includes(trimmedMessage);
 
-      // Check if it's a valid booking request
-      const isValidBookingRequest = packageNameMatch && expCodeMatch && dateMatch;
-
-      if (!isValidBookingRequest && !isGreetingOnly) {
-        await WhatsAppService.sendTextMessage(userPhone, {
-          type: "InteractiveButton",
-          data: {
-            message: {
-              type: "button",
-              body: {
-                text: `Hey there! 😊 I couldn't understand your message.\n\nYou can explore all our amazing trips at ⛰ Tripuva.com\n\nOr just reply with "Hi" to get started! 🚀`
-              },
-              action: {
-                buttons: [
-                  {
-                    type: "reply",
-                    reply: {
-                      id: "manage_bookings",
-                      title: "Manage Bookings"
-                    }
-                  }
-                ]
-              }
-            }
-          }
-        });
-        return res.status(200).json({ message: "Invalid request handled" });
+      // Handle manage bookings first (both button and text)
+      if (buttonTitle === "manage bookings" || trimmedMessage === "manage bookings") {
+        return await WebhookController.handleManageBookings(userPhone, res);
       }
 
-      // Handle greeting only if it's not a button click and not already processed
+      // Handle greetings only if it's not a button click
       if (isGreetingOnly && !buttonTitle) {
         await WhatsAppService.sendTextMessage(userPhone, {
           type: "InteractiveButton",
@@ -108,6 +70,45 @@ export class WebhookController {
           }
         });
         return res.status(200).json({ message: "Greeting handled" });
+      }
+
+      // Process booking request
+      const packageNameMatch = userMessage.match(/Trip:\s*(.+)/i);
+      const expCodeMatch = userMessage.match(
+        /\(?\s*Experience\s*code[:\s]*([A-Z0-9]+)\s*\)?/i,
+      );
+      const dateMatch = userMessage.match(
+        /Trip\s*Date[:\s]*([0-9]{2}-[A-Za-z]{3}-[0-9]{2})/i,
+      );
+
+      // Check if it's a valid booking request
+      const isValidBookingRequest = packageNameMatch && expCodeMatch && dateMatch;
+
+      // Handle invalid requests
+      if (!isValidBookingRequest) {
+        await WhatsAppService.sendTextMessage(userPhone, {
+          type: "InteractiveButton",
+          data: {
+            message: {
+              type: "button",
+              body: {
+                text: `Hey there! 😊 I couldn't understand your message.\n\nYou can explore all our amazing trips at ⛰ Tripuva.com\n\nOr just reply with "Hi" to get started! 🚀`
+              },
+              action: {
+                buttons: [
+                  {
+                    type: "reply",
+                    reply: {
+                      id: "manage_bookings",
+                      title: "Manage Bookings"
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        });
+        return res.status(200).json({ message: "Invalid request handled" });
       }
 
       // If we get here, it's a valid booking request
