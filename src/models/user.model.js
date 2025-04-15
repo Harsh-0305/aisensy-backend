@@ -26,7 +26,7 @@ export class UserModel {
   static async updateBookedPackages(userId, updatedPackages) {
     const { error } = await supabase
       .from("users")
-      .update({ booked_package: updatedPackages })
+      .update({ booked_packages: updatedPackages })
       .eq("user_id", userId);
 
     if (error) throw error;

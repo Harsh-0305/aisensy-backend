@@ -26,4 +26,6 @@ export const MESSAGES = {
     '🧳 You haven\'t booked any trips yet.\n\nExplore exciting trips at Tripuva.com 🌍 or reply with "Hi" to get started.',
   USER_NOT_FOUND:
     '😕 Couldn\'t find your account. Please try booking again or reply with "Hi" to restart.',
+  GREETING_RESPONSE:
+    'Hey Vedant ! 👋\n\nWelcome to Tripuva! 🌍✨\n\nWe help you find amazing group travel experiences across India. Check out our latest trips. 🚀\n\nExplore Group Trips: Tripuva.com',
 };

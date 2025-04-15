@@ -8,6 +8,7 @@ import webhookRoutes from "./routes/webhook.routes.js";
 import { errorHandler } from "./middleware/error.middleware.js";
 import { requestLogger } from "./middleware/logging.middleware.js";
 import { logger } from "./utils/logger.js";
+import { WebhookController } from "./controllers/webhook.controller.js";
 
 dotenv.config();
 
@@ -85,10 +86,11 @@ app.post("/webhook", async (req, res) => {
       console.log("trimmedMessage:", trimmedMessage);
       console.log("isManageBooking:", isManageBooking);
 
+      // Check if it's a valid booking request
+      const isValidBookingRequest = packageNameMatch && expCodeMatch && dateMatch;
+
       if (
-        !packageNameMatch &&
-        !expCodeMatch &&
-        !dateMatch &&
+        !isValidBookingRequest &&
         !isGreetingOnly &&
         !isManageBooking
       ) {
