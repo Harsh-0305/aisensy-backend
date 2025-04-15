@@ -18,35 +18,32 @@ export class WebhookController {
       const userPhone = `+91${data.customer.phone_number}`;
       let userMessage = data.message.message;
 
+      // Parse button click if present
       let buttonTitle = "";
       const rawMessage = data.message?.message || "";
 
-      // Parse button click if present
       if (rawMessage.startsWith("{") && rawMessage.endsWith("}")) {
         try {
           const parsedMessage = JSON.parse(rawMessage);
           buttonTitle = parsedMessage?.button_reply?.title?.trim().toLowerCase();
+          // If it's a button click, use that as the message
+          userMessage = buttonTitle;
         } catch (error) {
           logger.error("Failed to parse button message:", error);
         }
       }
 
-      // If no message but button click exists, use button title as message
-      if (!userMessage && buttonTitle) {
-        userMessage = buttonTitle;
-      }
-
-      const trimmedMessage = userMessage.trim().toLowerCase();
+      // Clean and normalize the message
+      const trimmedMessage = (userMessage || "").trim().toLowerCase();
       const greetings = ["hi", "hello", "hey"];
-      const isGreetingOnly = greetings.includes(trimmedMessage);
 
-      // Handle manage bookings first (both button and text)
-      if (buttonTitle === "manage bookings" || trimmedMessage === "manage bookings") {
+      // Handle manage bookings first
+      if (trimmedMessage === "manage bookings") {
         return await WebhookController.handleManageBookings(userPhone, res);
       }
 
-      // Handle greetings only if it's not a button click
-      if (isGreetingOnly && !buttonTitle) {
+      // Handle greetings
+      if (greetings.includes(trimmedMessage)) {
         await WhatsAppService.sendTextMessage(userPhone, {
           type: "InteractiveButton",
           data: {
