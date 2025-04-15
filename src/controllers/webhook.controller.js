@@ -211,28 +211,120 @@ export class WebhookController {
       if (!user) {
         await WhatsAppService.sendTextMessage(
           userPhone,
-          MESSAGES.USER_NOT_FOUND,
+          {
+            type: "InteractiveButton",
+            data: {
+              message: {
+                type: "button",
+                body: {
+                  text: `Hey there! 😊 I couldn't find your account.\n\nYou can explore all our amazing trips at ⛰ Tripuva.com\n\nOr just reply with "Hi" to get started! 🚀`
+                },
+                action: {
+                  buttons: [
+                    {
+                      type: "reply",
+                      reply: {
+                        id: "manage_bookings",
+                        title: "Manage Bookings"
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
         );
         return res.status(404).json({ error: "User not found" });
       }
 
-      if (!user.booked_packages) {
-        await WhatsAppService.sendTextMessage(userPhone, MESSAGES.NO_BOOKINGS);
+      if (!user.booked_packages || user.booked_packages.length === 0) {
+        await WhatsAppService.sendTextMessage(
+          userPhone,
+          {
+            type: "InteractiveButton",
+            data: {
+              message: {
+                type: "button",
+                body: {
+                  text: `Hey there! 😊 You haven't booked any trips yet.\n\nYou can explore all our amazing trips at ⛰ Tripuva.com\n\nOr just reply with "Hi" to get started! 🚀`
+                },
+                action: {
+                  buttons: [
+                    {
+                      type: "reply",
+                      reply: {
+                        id: "manage_bookings",
+                        title: "Manage Bookings"
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        );
         return res.status(200).json({ message: "No bookings" });
       }
 
       const packageList = user.booked_packages
         .map((pkg, index) => `${index + 1}. ${pkg}`)
         .join("\n");
+
       await WhatsAppService.sendTextMessage(
         userPhone,
-        `🗺️ Here are your booked trips:\n\n${packageList}\n\nNeed help managing any of these? Just reply with "Hi" or visit Tripuva.com`,
+        {
+          type: "InteractiveButton",
+          data: {
+            message: {
+              type: "button",
+              body: {
+                text: `🗺️ Here are your booked trips:\n\n${packageList}\n\nNeed help managing any of these? Just reply with "Hi" or visit Tripuva.com`
+              },
+              action: {
+                buttons: [
+                  {
+                    type: "reply",
+                    reply: {
+                      id: "manage_bookings",
+                      title: "Manage Bookings"
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        }
       );
 
       return res.status(200).json({ message: "Bookings sent" });
     } catch (error) {
       logger.error("Error handling manage bookings:", error);
-      throw error;
+      await WhatsAppService.sendTextMessage(
+        userPhone,
+        {
+          type: "InteractiveButton",
+          data: {
+            message: {
+              type: "button",
+              body: {
+                text: `Hey there! 😊 We encountered an error while fetching your bookings.\n\nYou can explore all our amazing trips at ⛰ Tripuva.com\n\nOr just reply with "Hi" to get started! 🚀`
+              },
+              action: {
+                buttons: [
+                  {
+                    type: "reply",
+                    reply: {
+                      id: "manage_bookings",
+                      title: "Manage Bookings"
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        }
+      );
+      return res.status(500).json({ error: "Internal server error" });
     }
   }
 
