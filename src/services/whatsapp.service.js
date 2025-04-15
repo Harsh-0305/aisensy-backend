@@ -7,6 +7,12 @@ export class WhatsAppService {
     try {
       // Handle interactive button messages
       if (typeof message === 'object' && message.type === "InteractiveButton") {
+        const messageText = message.data.message.body.text;
+        if (messageText.length > 1024) {
+          logger.warn("Message exceeds 1024 characters, truncating...");
+          message.data.message.body.text = messageText.substring(0, 1021) + "...";
+        }
+
         const response = await axios.post(
           whatsappConfig.apiUrl,
           {
@@ -29,6 +35,11 @@ export class WhatsAppService {
       }
 
       // Handle regular text messages
+      if (typeof message === 'string' && message.length > 1024) {
+        logger.warn("Message exceeds 1024 characters, truncating...");
+        message = message.substring(0, 1021) + "...";
+      }
+
       const response = await axios.post(
         whatsappConfig.apiUrl,
         {
@@ -55,6 +66,11 @@ export class WhatsAppService {
 
   static async sendImageMessage(phone, message, imageUrl) {
     try {
+      if (typeof message === 'string' && message.length > 1024) {
+        logger.warn("Message exceeds 1024 characters, truncating...");
+        message = message.substring(0, 1021) + "...";
+      }
+
       const response = await axios.post(
         whatsappConfig.apiUrl,
         {
