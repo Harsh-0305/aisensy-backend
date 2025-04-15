@@ -5,11 +5,35 @@ import { logger } from "../utils/logger.js";
 export class WhatsAppService {
   static async sendTextMessage(phone, message) {
     try {
+      // Handle interactive button messages
+      if (typeof message === 'object' && message.type === "InteractiveButton") {
+        const response = await axios.post(
+          whatsappConfig.apiUrl,
+          {
+            countryCode: "+91",
+            phoneNumber: phone.replace("+91", ""),
+            callbackData: "response_sent",
+            type: "InteractiveButton",
+            data: {
+              message: message.data.message.body.text,
+              preview_url: false,
+              buttons: message.data.message.action.buttons
+            },
+          },
+          {
+            headers: whatsappConfig.headers,
+          },
+        );
+        logger.info("Interactive message sent successfully:", response.data);
+        return response.data;
+      }
+
+      // Handle regular text messages
       const response = await axios.post(
         whatsappConfig.apiUrl,
         {
-          userId: "",
-          fullPhoneNumber: phone,
+          countryCode: "+91",
+          phoneNumber: phone.replace("+91", ""),
           callbackData: "response_sent",
           type: "Text",
           data: {
@@ -34,8 +58,8 @@ export class WhatsAppService {
       const response = await axios.post(
         whatsappConfig.apiUrl,
         {
-          userId: "",
-          fullPhoneNumber: phone,
+          countryCode: "+91",
+          phoneNumber: phone.replace("+91", ""),
           callbackData: "response_sent",
           type: "Image",
           data: {
