@@ -523,14 +523,18 @@ app.post("/test", async (req, res) => {
         {
           messaging_product: "whatsapp",
           to: "918094556379",
-          type: "text",
-          text: {
-            body: "Hey Harsh! 👋 Just testing a custom message from the backend. All looks goooooood"
+          type: "template",
+          template: {
+              name: "hello_world",
+              language: {
+                  code: "en_US"
+              }
           }
-        },
+      }
+        ,
         {
           headers: {
-            Authorization: process.env.WHATSAPP_ACCESS_TOKEN,
+            "Authorization": "Basic EAALZCcqdF77gBO4X5KiKntZCo5ZBgh21crOgIZCCl39GDE28yxVBVgYbQR2maGgTOvb1LLZCyth1lsifZAwsjgKeYGIhR5jsawkdFghLFh9bZAckTbUZBCDDKFYFamikshOnJPn2ZAzHYqCNM33ZAtvsNcN20qwdNm1T3ATpFDwgnZCgzgxP1ZCLZBrYFN3QVBwgLBhZBt8FJSaZCNaZBrvYlXfSp5S8cL566nw7qWBoRrVLLsyo",
             "Content-Type": "application/json"
           }
         }
