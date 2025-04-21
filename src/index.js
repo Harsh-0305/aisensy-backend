@@ -516,6 +516,7 @@ async function processRazorpayWebhook(body, signature) {
 
 {/***************************************************** */}
 
+{/*}
 app.get("/webhook", (req, res) => {
   const VERIFY_TOKEN = "13LxRkteG9ezn5ouyNCkITD_1tgOZfUqR1kdu1XLXlQw"; // match this with Meta
 
@@ -531,6 +532,33 @@ app.get("/webhook", (req, res) => {
   } else {
     console.log("❌ Verification failed");
     res.sendStatus(403);
+  }
+});
+*/}
+
+app.post("/webhook", (req, res) => {
+  const body = req.body;
+
+  console.log("📥 Incoming webhook:", JSON.stringify(body, null, 2));
+
+  // Always respond with 200 OK so Facebook knows you received it
+  res.sendStatus(200);
+
+  // Check for WhatsApp messages
+  if (
+    body.object &&
+    body.entry &&
+    body.entry[0].changes &&
+    body.entry[0].changes[0].value.messages
+  ) {
+    const messageObj = body.entry[0].changes[0].value.messages[0];
+    const from = messageObj.from; // phone number
+    const text = messageObj.text?.body || ""; // message text
+
+    console.log(`📨 New message from ${from}: ${text}`);
+
+    // 👉 Call your sendWhatsAppMessage1 function here to respond
+    sendWhatsAppMessage1(from, `Hi! You said: ${text}`);
   }
 });
 
