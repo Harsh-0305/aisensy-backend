@@ -191,6 +191,8 @@ if(pkg1){console.log("Valid Trip");
 
     const messageSent1 = await sendWhatsAppMessage2(userPhone," ", responseMessage1);
 
+    const messageSent3= await sendCustomWhatsAppMessage("918094556379",responseMessage1);
+
    if (!messageSent1) {
         return res.status(500).json({ error: "Failed to send WhatsApp message to the customer" });
     }
@@ -543,6 +545,34 @@ app.post("/test", async (req, res) => {
     res.status(500).json({ error: "Failed to send message", details: error.response?.data });
   }
 });
+
+const sendCustomWhatsAppMessage = async (phone, message) => {
+  try {
+    const response = await axios.post(
+      "https://graph.facebook.com/v17.0/363441863528600/messages",
+      {
+        messaging_product: "whatsapp",
+        recipient_type: "individual",
+        to: phone,
+        type: "text",
+        text: {
+          body: message,
+          preview_url: false
+        }
+      },
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${process.env.WHATSAPP_TOKEN}`
+        }
+      }
+    );
+
+    console.log("✅ Custom WhatsApp message sent:", response.data);
+  } catch (error) {
+    console.error("❌ Failed to send message:", error.response?.data || error.message);
+  }
+};
 
 app.get('/health', (req, res) => {
   console.log('Health check received at:', new Date().toISOString());
