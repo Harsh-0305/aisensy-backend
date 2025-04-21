@@ -519,7 +519,7 @@ app.post("/test", async (req, res) => {
   if (message === "ok") {
     try {
       const response = await axios.post(
-        `https://graph.facebook.com/v19.0/363441863528600/messages`,
+        `https://graph.facebook.com/v22.0/363441863528600/messages`,
         {
           messaging_product: "whatsapp",
           to: "918094556379",
