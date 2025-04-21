@@ -541,6 +541,9 @@ app.post('/webhook', (req, res) => {
   
   const body = req.body;
   console.log("📩 Incoming webhook:", JSON.stringify(req.body, null, 2));
+
+  console.log("*** 1 ***",body?.object);
+  console.log("*** 2 ***",body.entry?.[0]?.changes?.[0]?.value?.messages);
   // Confirm it's a message notification
   if (body?.object && body.entry?.[0]?.changes?.[0]?.value?.messages) {
     const messageData = body.entry[0].changes[0].value;
