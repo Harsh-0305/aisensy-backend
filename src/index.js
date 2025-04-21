@@ -517,19 +517,23 @@ async function processRazorpayWebhook(body, signature) {
 {/***************************************************** */}
 
 app.get("/webhook", (req, res) => {
-  const verifyToken = process.env.VERIFY_TOKEN;
+  const VERIFY_TOKEN = "13LxRkteG9ezn5ouyNCkITD_1tgOZfUqR1kdu1XLXlQw"; // match this with Meta
 
   const mode = req.query["hub.mode"];
   const token = req.query["hub.verify_token"];
   const challenge = req.query["hub.challenge"];
 
-  if (mode && token === verifyToken) {
-    console.log("🟢 Webhook verified!");
+  console.log("🔔 Webhook verification request:", req.query);
+
+  if (mode === "subscribe" && token === VERIFY_TOKEN) {
+    console.log("✅ Webhook verified");
     res.status(200).send(challenge);
   } else {
+    console.log("❌ Verification failed");
     res.sendStatus(403);
   }
 });
+
 
 
 app.post("/test", async (req, res) => {
