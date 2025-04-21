@@ -530,7 +530,7 @@ app.post("/test", async (req, res) => {
         },
         {
           headers: {
-            Authorization: "EAALZCcqdF77gBO93BZCBSZB0Yi1HBVWMCSIcRtHkgvF8KSU4OBGDeaoudmC2DuqGwqcFX02ODe66KTZAXj0evkywOZB2MeAPZA8h6oWtIkpYrc5GdhkmIWOeTCTu6TWNZBAVRZBzQcOC8ujWw5Rm2rZCWZCOgwA4ZBRB13EK2UK7vR05hBXGPIZC5xMbpzgf5ftTHrb6yPwPVnOeYwXY5BvXNz2K7ELajGJ3",
+            Authorization: "Bearer EAALZCcqdF77gBO93BZCBSZB0Yi1HBVWMCSIcRtHkgvF8KSU4OBGDeaoudmC2DuqGwqcFX02ODe66KTZAXj0evkywOZB2MeAPZA8h6oWtIkpYrc5GdhkmIWOeTCTu6TWNZBAVRZBzQcOC8ujWw5Rm2rZCWZCOgwA4ZBRB13EK2UK7vR05hBXGPIZC5xMbpzgf5ftTHrb6yPwPVnOeYwXY5BvXNz2K7ELajGJ3",
             "Content-Type": "application/json"
           }
         }
