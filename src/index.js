@@ -519,13 +519,12 @@ app.post("/test", async (req, res) => {
       "https://graph.facebook.com/v22.0/363441863528600/messages",
       {
         messaging_product: "whatsapp",
+        recipient_type: "individual",
         to: "918094556379",
-        type: "template",
-        template: {
-          name: "hello_world",
-          language: {
-            code: "en_US"
-          }
+        type: "text",
+        text: {
+          body: "Custom msg",
+          preview_url: false
         }
       },
       {
