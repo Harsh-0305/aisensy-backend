@@ -513,7 +513,7 @@ async function processRazorpayWebhook(body, signature) {
 }
 
 
-app.post("/send-template", async (req, res) => {
+app.post("/test", async (req, res) => {
   try {
     const response = await axios.post(
       "https://graph.facebook.com/v22.0/363441863528600/messages",
