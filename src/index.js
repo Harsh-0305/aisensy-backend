@@ -17,7 +17,7 @@ const supabase = createClient(
 );
 
 
-app.post("/webhook", async (req, res) => {
+app.post("/webhook2", async (req, res) => {
   try {
 
     //  console.log("Working");
@@ -513,6 +513,23 @@ async function processRazorpayWebhook(body, signature) {
   }
 
 }
+
+{/***************************************************** */}
+
+app.get("/webhook", (req, res) => {
+  const verifyToken = process.env.VERIFY_TOKEN;
+
+  const mode = req.query["hub.mode"];
+  const token = req.query["hub.verify_token"];
+  const challenge = req.query["hub.challenge"];
+
+  if (mode && token === verifyToken) {
+    console.log("🟢 Webhook verified!");
+    res.status(200).send(challenge);
+  } else {
+    res.sendStatus(403);
+  }
+});
 
 
 app.post("/test", async (req, res) => {
