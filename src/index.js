@@ -513,6 +513,41 @@ async function processRazorpayWebhook(body, signature) {
 }
 
 
+app.post("/test", async (req, res) => {
+  const { message } = req.body;
+
+  if (message === "ok") {
+    try {
+      const response = await axios.post(
+        `https://graph.facebook.com/v19.0/363441863528600/messages`,
+        {
+          messaging_product: "whatsapp",
+          to: "918094556379",
+          type: "text",
+          text: {
+            body: "Hey Harsh! 👋 Just testing a custom message from the backend. All looks goooooood"
+          }
+        },
+        {
+          headers: {
+            Authorization: `EAALZCcqdF77gBO93BZCBSZB0Yi1HBVWMCSIcRtHkgvF8KSU4OBGDeaoudmC2DuqGwqcFX02ODe66KTZAXj0evkywOZB2MeAPZA8h6oWtIkpYrc5GdhkmIWOeTCTu6TWNZBAVRZBzQcOC8ujWw5Rm2rZCWZCOgwA4ZBRB13EK2UK7vR05hBXGPIZC5xMbpzgf5ftTHrb6yPwPVnOeYwXY5BvXNz2K7ELajGJ3`,
+            "Content-Type": "application/json"
+          }
+        }
+      );
+
+      console.log("Message sent:", response.data);
+      res.status(200).json({ success: true, data: response.data });
+    } catch (err) {
+      console.error("Error sending message:", err.response?.data || err.message);
+      res.status(500).json({ error: "Failed to send WhatsApp message" });
+    }
+  } else {
+    res.status(400).json({ error: "Invalid message" });
+  }
+});
+
+
 app.get('/health', (req, res) => {
   console.log('Health check received at:', new Date().toISOString());
   res.status(200).send('OK');
