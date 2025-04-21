@@ -517,7 +517,7 @@ async function processRazorpayWebhook(body, signature) {
 {/***************************************************** */}
 
 
-app.get("/webhook", (req, res) => {
+app.get("/webhook2", (req, res) => {
   const VERIFY_TOKEN = "13LxRkteG9ezn5ouyNCkITD_1tgOZfUqR1kdu1XLXlQw"; // match this with Meta
 
   const mode = req.query["hub.mode"];
@@ -536,31 +536,26 @@ app.get("/webhook", (req, res) => {
 });
 
 
-app.post("/webhook2", (req, res) => {
+app.post('/webhook', (req, res) => {
   const body = req.body;
 
-  console.log("📥 Incoming webhook:", JSON.stringify(body, null, 2));
+  // Confirm it's a message notification
+  if (body?.object && body.entry?.[0]?.changes?.[0]?.value?.messages) {
+    const messageData = body.entry[0].changes[0].value;
 
-  // Always respond with 200 OK so Facebook knows you received it
-  res.sendStatus(200);
+    const userPhone = messageData.messages[0].from;
+    const userMessage = messageData.messages[0].text?.body;
+    const userName = messageData.contacts?.[0]?.profile?.name;
 
-  // Check for WhatsApp messages
-  if (
-    body.object &&
-    body.entry &&
-    body.entry[0].changes &&
-    body.entry[0].changes[0].value.messages
-  ) {
-    const messageObj = body.entry[0].changes[0].value.messages[0];
-    const from = messageObj.from; // phone number
-    const text = messageObj.text?.body || ""; // message text
+    console.log(`📨 Message from ${userName} (${userPhone}): ${userMessage}`);
 
-    console.log(`📨 New message from ${from}: ${text}`);
-
-    // 👉 Call your sendWhatsAppMessage1 function here to respond
-    sendWhatsAppMessage1(from, `Hi! You said: ${text}`);
+    // You can now send a reply using your custom function
+    sendWhatsAppMessage1(userPhone, `Hello ${userName}, you said: "${userMessage}"`);
   }
+
+  res.sendStatus(200);
 });
+
 
 
 
