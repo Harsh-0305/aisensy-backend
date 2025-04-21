@@ -513,44 +513,37 @@ async function processRazorpayWebhook(body, signature) {
 }
 
 
-app.post("/test", async (req, res) => {
-  const { message } = req.body;
-
-  if (message === "ok") {
-    try {
-      const response = await axios.post(
-        `https://graph.facebook.com/v22.0/363441863528600/messages`,
-        {
-          messaging_product: "whatsapp",
-          to: "918094556379",
-          type: "template",
-          template: {
-              name: "hello_world",
-              language: {
-                  code: "en_US"
-              }
-          }
-      }
-        ,
-        {
-          headers: {
-            "Authorization": "Basic EAALZCcqdF77gBO4X5KiKntZCo5ZBgh21crOgIZCCl39GDE28yxVBVgYbQR2maGgTOvb1LLZCyth1lsifZAwsjgKeYGIhR5jsawkdFghLFh9bZAckTbUZBCDDKFYFamikshOnJPn2ZAzHYqCNM33ZAtvsNcN20qwdNm1T3ATpFDwgnZCgzgxP1ZCLZBrYFN3QVBwgLBhZBt8FJSaZCNaZBrvYlXfSp5S8cL566nw7qWBoRrVLLsyo",
-            "Content-Type": "application/json"
+app.post("/send-template", async (req, res) => {
+  try {
+    const response = await axios.post(
+      "https://graph.facebook.com/v22.0/363441863528600/messages",
+      {
+        messaging_product: "whatsapp",
+        to: "918094556379",
+        type: "template",
+        template: {
+          name: "hello_world",
+          language: {
+            code: "en_US"
           }
         }
-      );
+      },
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${process.env.WHATSAPP_TOKEN}`
+        },
+        maxBodyLength: Infinity
+      }
+    );
 
-      console.log("Message sent:", response.data);
-      res.status(200).json({ success: true, data: response.data });
-    } catch (err) {
-      console.error("Error sending message:", err.response?.data || err.message);
-      res.status(500).json({ error: "Failed to send WhatsApp message" });
-    }
-  } else {
-    res.status(400).json({ error: "Invalid message" });
+    console.log("✅ Message sent:", response.data);
+    res.status(200).json(response.data);
+  } catch (error) {
+    console.error("❌ Error sending message:", error.response?.data || error.message);
+    res.status(500).json({ error: "Failed to send message", details: error.response?.data });
   }
 });
-
 
 app.get('/health', (req, res) => {
   console.log('Health check received at:', new Date().toISOString());
