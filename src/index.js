@@ -530,7 +530,7 @@ app.post("/test", async (req, res) => {
         },
         {
           headers: {
-            Authorization: "EAALZCcqdF77gBO3rZBoYzBjy3fXcJdYvnD1xA6MRrD7Vn9ROw7Wa1K0rR0lnukQZBZBEQcmYOwMtHdzLxM0vP872WIDWsu72hXpz8RCOdZAMj3aZCZCerVcL7dDlPIr6KSYRqO8GV9qpU9F7Upq1cRUQb7k0ZBQS0wtr3XOcMfYAzuGhzrA2d0ettGsL",
+            Authorization: process.env.WHATSAPP_ACCESS_TOKEN,
             "Content-Type": "application/json"
           }
         }
