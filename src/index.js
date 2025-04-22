@@ -517,7 +517,7 @@ async function processRazorpayWebhook(body, signature) {
 {/***************************************************** */}
 
 
-app.get("/webhook2", (req, res) => {
+app.get("/webhook", (req, res) => {
   const VERIFY_TOKEN = "13LxRkteG9ezn5ouyNCkITD_1tgOZfUqR1kdu1XLXlQw"; // match this with Meta
 
   const mode = req.query["hub.mode"];
@@ -538,16 +538,8 @@ app.get("/webhook2", (req, res) => {
 
 app.post('/webhook', (req, res) => {
 
-  const VERIFY_TOKEN = "13LxRkteG9ezn5ouyNCkITD_1tgOZfUqR1kdu1XLXlQw";
-  const token = req.query["hub.verify_token"];
-
   const body = req.body;
   console.log("📩 Incoming webhook:", JSON.stringify(req.body, null, 2));
-
-  if(token == VERIFY_TOKEN){
-    console.log("✅ Token Verified");
-    res.status(200);
-  }
 
   console.log("*** 1 ***",body?.object);
   console.log("*** 2 ***",body.entry?.[0]?.changes?.[0]?.value?.messages);
