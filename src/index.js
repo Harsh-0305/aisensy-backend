@@ -548,6 +548,17 @@ app.post('/webhook', (req, res) => {
 
   console.log('📥 /webhook POST hit');
 
+  const body = req.body;
+  console.log("📩 Full webhook body:", JSON.stringify(body, null, 2));
+
+  const changes = body.entry?.[0]?.changes;
+  if (changes) {
+    changes.forEach(change => {
+      console.log(`🔄 Change field: ${change.field}`);
+      console.log("📦 Change value:", JSON.stringify(change.value, null, 2));
+    });
+  }
+
   console.log('📬 Incoming Headers:', JSON.stringify(req.headers, null, 2));
   const APP_SECRET = process.env.APP_SECRET; // get from Facebook Developer Dashboard
 
