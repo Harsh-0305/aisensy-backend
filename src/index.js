@@ -8,8 +8,12 @@ import crypto from 'crypto';
 dotenv.config();
 
 const app = express();
-app.use(express.json());
 
+app.use(express.json({
+  verify: (req, res, buf) => {
+    req.rawBody = buf;
+  }
+}));
 // Initialize Supabase client
 const supabase = createClient(
   process.env.SUPABASE_URL,
@@ -536,11 +540,7 @@ app.get("/webhook", (req, res) => {
 });
 
 
-app.use(express.json({
-  verify: (req, res, buf) => {
-    req.rawBody = buf;
-  }
-}));
+
 
 
 
