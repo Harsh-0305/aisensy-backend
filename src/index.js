@@ -548,10 +548,10 @@ app.post('/webhook', (req, res) => {
 
   console.log('📥 /webhook POST hit');
 
-  const body = req.body;
-  console.log("📩 Full webhook body:", JSON.stringify(body, null, 2));
+  const body2 = req.body;
+  console.log("📩 Full webhook body:", JSON.stringify(body2, null, 2));
 
-  const changes = body.entry?.[0]?.changes;
+  const changes = body2.entry?.[0]?.changes;
   if (changes) {
     changes.forEach(change => {
       console.log(`🔄 Change field: ${change.field}`);
