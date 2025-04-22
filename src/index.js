@@ -545,6 +545,8 @@ app.use(express.json({
 
 
 app.post('/webhook', (req, res) => {
+
+  console.log('📬 Incoming Headers:', JSON.stringify(req.headers, null, 2));
   const APP_SECRET = process.env.APP_SECRET; // get from Facebook Developer Dashboard
 
   const signature = req.headers['x-hub-signature-256'];
