@@ -538,7 +538,9 @@ app.get("/webhook2", (req, res) => {
 
 app.post('/webhook', (req, res) => {
 
-  
+  const VERIFY_TOKEN = "13LxRkteG9ezn5ouyNCkITD_1tgOZfUqR1kdu1XLXlQw";
+  const token = req.query["hub.verify_token"];
+
   const body = req.body;
   console.log("📩 Incoming webhook:", JSON.stringify(req.body, null, 2));
 
