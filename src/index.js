@@ -536,28 +536,52 @@ app.get("/webhook", (req, res) => {
 });
 
 
-app.post('/webhook', (req, res) => {
-  console.log("📩 Full Webhook Payload:", JSON.stringify(req.body, null, 2));
+app.use(express.json({
+  verify: (req, res, buf) => {
+    req.rawBody = buf;
+  }
+}));
 
-  // Case 1: Standard WhatsApp message (from Meta)
-  if (req.body?.object === "whatsapp_business_account" && req.body.entry?.[0]?.changes?.[0]?.value?.messages) {
-    const messageData = req.body.entry[0].changes[0].value;
+
+
+app.post('/webhook', (req, res) => {
+  const APP_SECRET = process.env.APP_SECRET; // get from Facebook Developer Dashboard
+
+  const signature = req.headers['x-hub-signature-256'];
+
+  if (!signature) {
+    console.warn('⚠️ No signature found');
+    return res.sendStatus(403);
+  }
+
+  const hash = crypto
+    .createHmac('sha256', APP_SECRET)
+    .update(req.rawBody)
+    .digest('hex');
+
+  const expectedSignature = `sha256=${hash}`;
+
+  if (signature !== expectedSignature) {
+    console.error('❌ Signature mismatch');
+    return res.sendStatus(403);
+  }
+
+  console.log('✅ Signature verified');
+
+  // Continue with your webhook logic here...
+  const body = req.body;
+  console.log("📩 Incoming webhook:", JSON.stringify(body, null, 2));
+
+  if (body?.object && body.entry?.[0]?.changes?.[0]?.value?.messages) {
+    const messageData = body.entry[0].changes[0].value;
+
     const userPhone = messageData.messages[0].from;
     const userMessage = messageData.messages[0].text?.body;
     const userName = messageData.contacts?.[0]?.profile?.name;
 
-    console.log(`📨 WhatsApp Message from ${userName} (${userPhone}): ${userMessage}`);
+    console.log(`📨 Message from ${userName} (${userPhone}): ${userMessage}`);
+
     sendWhatsAppMessage1(userPhone, `Hello ${userName}, you said: "${userMessage}"`);
-  }
-  // Case 2: Meta Developer Dashboard Test (different structure)
-  else if (req.body?.field === "messages" && req.body?.value?.messages) {
-    console.log("🔧 Meta Webhook Test Received");
-    const testMessage = req.body.value.messages[0].text.body;
-    console.log(`🛠️ Test Message: ${testMessage}`);
-  }
-  // Case 3: Unknown payload
-  else {
-    console.log("❌ Unsupported payload structure:", req.body);
   }
 
   res.sendStatus(200);
