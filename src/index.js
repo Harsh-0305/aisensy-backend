@@ -537,24 +537,27 @@ app.get("/webhook", (req, res) => {
 
 
 app.post('/webhook', (req, res) => {
+  console.log("📩 Full Webhook Payload:", JSON.stringify(req.body, null, 2));
 
-  const body = req.body;
-  console.log("📩 Incoming webhook:", JSON.stringify(req.body, null, 2));
-
-  console.log("*** 1 ***",body?.object);
-  console.log("*** 2 ***",body.entry?.[0]?.changes?.[0]?.value?.messages);
-  // Confirm it's a message notification
-  if (body?.object && body.entry?.[0]?.changes?.[0]?.value?.messages) {
-    const messageData = body.entry[0].changes[0].value;
-
+  // Case 1: Standard WhatsApp message (from Meta)
+  if (req.body?.object === "whatsapp_business_account" && req.body.entry?.[0]?.changes?.[0]?.value?.messages) {
+    const messageData = req.body.entry[0].changes[0].value;
     const userPhone = messageData.messages[0].from;
     const userMessage = messageData.messages[0].text?.body;
     const userName = messageData.contacts?.[0]?.profile?.name;
 
-    console.log(`📨 Message from ${userName} (${userPhone}): ${userMessage}`);
-
-    // You can now send a reply using your custom function
+    console.log(`📨 WhatsApp Message from ${userName} (${userPhone}): ${userMessage}`);
     sendWhatsAppMessage1(userPhone, `Hello ${userName}, you said: "${userMessage}"`);
+  }
+  // Case 2: Meta Developer Dashboard Test (different structure)
+  else if (req.body?.field === "messages" && req.body?.value?.messages) {
+    console.log("🔧 Meta Webhook Test Received");
+    const testMessage = req.body.value.messages[0].text.body;
+    console.log(`🛠️ Test Message: ${testMessage}`);
+  }
+  // Case 3: Unknown payload
+  else {
+    console.log("❌ Unsupported payload structure:", req.body);
   }
 
   res.sendStatus(200);
